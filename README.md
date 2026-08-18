@@ -1,43 +1,28 @@
-# Stego Platform PWA
+# Stego Platform PWA — Local Working Prototype
 
-GitHub Pages deploy-ready build.
+Deploy-ready GitHub Pages build.
 
-## Included
-- Progressive Web App manifest
-- Service worker with offline app-shell caching
-- Installable icons (192, 512, maskable)
-- Animated Stego splash screen
-- Astronaut/logo flying through space toward Stegoland
-- Existing customer and admin mockup
-- Menu, membership, booking, school visits, backup/export UI
+## What's working now
+- PWA install + service worker
+- Smooth astronaut/rocket splash animation
+- No planet graphic in splash
+- Customer food cart
+- Local food orders
+- Local Stegoland ticket bookings
+- Local school-visit requests
+- Admin menu edit / add / sold-out controls
+- Admin settings
+- Member database
+- Dashboard KPIs calculated from locally saved activity
+- JSON full backup / restore
+- CSV member, order and school-visit exports
+- LocalStorage persistence across browser refreshes
 
-## Deploy to GitHub Pages
-1. Create/open a GitHub repository.
-2. Upload all files from this folder to the repository root.
-3. Go to **Settings → Pages**.
-4. Select **Deploy from a branch**.
-5. Choose `main` and `/ (root)`.
-6. Save and wait for deployment.
+## Storage
+This version uses browser `localStorage`, so it is ideal for prototyping before Firebase.
 
-### Important for PWA testing
-GitHub Pages uses HTTPS, so the service worker and PWA install flow work correctly there.
+Data stays on the same browser/device only. Clearing browser site data will remove it unless a JSON backup is exported first.
 
-### Files
-- `index.html`
-- `manifest.webmanifest`
-- `sw.js`
-- `icon-192.png`
-- `icon-512.png`
-- `icon-maskable-512.png`
-- `.nojekyll`
+## GitHub Pages
+Upload every file in this folder to the repository root and enable GitHub Pages from `main` / root.
 
-- Admin dashboard emojis replaced with professional inline SVG iconography.
-
-- Splash astronaut is now isolated on a transparent background with no square box.
-- Astronaut and rocket flame have been enlarged.
-- Customer header now uses a transparent Stegoland logo for better visual blending.
-
-- Splash now uses the astronaut riding the red-and-white rocket asset.
-- No Stegoland text/background is attached to the flying asset.
-- Flying rocket is larger with a smoother, more cinematic trajectory.
-- Removed duplicate CSS flame because the artwork already contains rocket flames.

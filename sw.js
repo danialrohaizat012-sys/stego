@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stego-pwa-v4';
+const CACHE_NAME = 'stego-pwa-v5-local';
 const APP_SHELL = [
   './',
   './index.html',

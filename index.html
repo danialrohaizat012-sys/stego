@@ -186,26 +186,14 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
 .space-stars:after{background-size:137px 137px;opacity:.18;transform:translate(31px,11px);animation-duration:12s}
 @keyframes starDrift{to{transform:translate(-90px,70px)}}
 
-.destination{
-  position:absolute;right:7%;top:22%;width:126px;height:126px;border-radius:50%;
-  background:radial-gradient(circle at 36% 30%,#7bd4ff 0 8%,#38a8f1 9% 28%,#1e66c4 29% 65%,#153985 66%);
-  box-shadow:0 0 50px rgba(96,180,255,.42),inset -12px -14px 24px rgba(6,20,70,.35);
-  animation:planetPulse 2.5s ease-in-out infinite;
 }
-.destination:before{
-  content:"";position:absolute;left:-28px;right:-28px;top:52px;height:22px;
-  border:7px solid #ffc82e;border-left-color:transparent;border-right-color:transparent;border-radius:50%;
-  transform:rotate(-12deg);filter:drop-shadow(0 5px 2px rgba(0,0,0,.18))
-}
-.destination-label{
-  position:absolute;right:4.5%;top:calc(22% + 142px);color:white;font-weight:1000;
-  letter-spacing:.14em;font-size:13px;text-shadow:0 4px 18px rgba(0,0,0,.3)
-}
-@keyframes planetPulse{50%{transform:scale(1.035);box-shadow:0 0 68px rgba(96,180,255,.55),inset -12px -14px 24px rgba(6,20,70,.35)}}
 
 .flight-wrap{
-  position:absolute;left:-1%;bottom:13%;width:330px;height:330px;
-  animation:flyToStego 3.45s cubic-bezier(.24,.72,.22,1) forwards;
+  position:absolute;left:-7%;bottom:8%;width:335px;height:335px;
+  animation:flyToStego 4.15s cubic-bezier(.18,.72,.22,1) forwards;
+  will-change:transform,opacity;
+  backface-visibility:hidden;
+  transform:translate3d(0,0,0);
 }
 .flight-logo{
   width:100%;height:100%;object-fit:contain;
@@ -224,15 +212,16 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.82));
   box-shadow:0 -28px 0 rgba(255,255,255,.22),0 31px 0 rgba(255,255,255,.16)
 }
-@keyframes shipBob{to{transform:translateY(-6px) rotate(1.5deg)}}
+@keyframes shipBob{from{transform:translate3d(0,0,0) rotate(-.6deg)}to{transform:translate3d(0,-4px,0) rotate(.6deg)}}
 @keyframes flame{from{transform:rotate(-12deg) scaleX(.72)}to{transform:rotate(-12deg) scaleX(1.12)}}
 @keyframes flyToStego{
-  0%{transform:translate(-42vw,22vh) rotate(-10deg) scale(.72);opacity:0}
-  9%{opacity:1}
-  42%{transform:translate(18vw,-4vh) rotate(-8deg) scale(.96)}
-  67%{transform:translate(38vw,-24vh) rotate(-5deg) scale(.82)}
-  86%{transform:translate(56vw,-37vh) rotate(-2deg) scale(.48);opacity:1}
-  100%{transform:translate(67vw,-45vh) rotate(1deg) scale(.16);opacity:0}
+  0%   {transform:translate3d(-34vw,18vh,0) rotate(-12deg) scale(.76);opacity:0}
+  8%   {opacity:1}
+  28%  {transform:translate3d(6vw,3vh,0) rotate(-10deg) scale(.93)}
+  52%  {transform:translate3d(34vw,-15vh,0) rotate(-7deg) scale(.86)}
+  74%  {transform:translate3d(58vw,-30vh,0) rotate(-4deg) scale(.63)}
+  90%  {transform:translate3d(76vw,-43vh,0) rotate(-1deg) scale(.38);opacity:1}
+  100% {transform:translate3d(91vw,-55vh,0) rotate(0deg) scale(.18);opacity:0}
 }
 .splash-copy{
   position:absolute;left:0;right:0;bottom:8.5%;text-align:center;color:#fff;padding:0 24px;
@@ -248,14 +237,15 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
   .destination{right:5%;top:18%;width:104px;height:104px}
   .destination:before{top:43px}
   .destination-label{right:2.5%;top:calc(18% + 120px);font-size:11px}
-  .flight-wrap{width:285px;height:285px;left:-8%;bottom:18%}
+  .flight-wrap{width:285px;height:285px;left:-12%;bottom:13%}
   @keyframes flyToStego{
-    0%{transform:translate(-78vw,24vh) rotate(-10deg) scale(.68);opacity:0}
-    10%{opacity:1}
-    45%{transform:translate(12vw,-2vh) rotate(-8deg) scale(.94)}
-    68%{transform:translate(38vw,-21vh) rotate(-5deg) scale(.78)}
-    86%{transform:translate(60vw,-35vh) rotate(-2deg) scale(.46);opacity:1}
-    100%{transform:translate(76vw,-44vh) rotate(1deg) scale(.15);opacity:0}
+    0%   {transform:translate3d(-68vw,19vh,0) rotate(-12deg) scale(.72);opacity:0}
+    8%   {opacity:1}
+    30%  {transform:translate3d(2vw,4vh,0) rotate(-10deg) scale(.94)}
+    54%  {transform:translate3d(34vw,-14vh,0) rotate(-7deg) scale(.84)}
+    75%  {transform:translate3d(58vw,-29vh,0) rotate(-4deg) scale(.61)}
+    91%  {transform:translate3d(80vw,-43vh,0) rotate(-1deg) scale(.34);opacity:1}
+    100% {transform:translate3d(98vw,-55vh,0) rotate(0deg) scale(.16);opacity:0}
   }
 }
 </style>
@@ -265,15 +255,13 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
 
 <div id="stegoSplash" aria-label="Stego loading screen">
   <div class="space-stars"></div>
-  <div class="destination"></div>
-  <div class="destination-label">STEGOLAND</div>
   <div class="flight-wrap">
     <div class="speed-line"></div>
     
     <img class="flight-logo" src="stego-rocket-astronaut.png" alt="Stego astronaut flying">
   </div>
   <div class="splash-copy">
-    <span>Destination</span>
+    <span>Stego Journey</span>
     <b>On the way to Stegoland 🚀</b>
     <div class="loading-orbit"></div>
   </div>
@@ -346,7 +334,7 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
               <label style="font-size:10px;color:var(--muted)">Kids<input id="kidQty" type="number" class="input" value="1" min="0"></label>
               <label style="font-size:10px;color:var(--muted)">Guardian • RM5<input id="guardianQty" type="number" class="input" value="1" min="0"></label>
             </div>
-            <button class="btn" onclick="ticketCalc()">Calculate Booking</button>
+            <div style="display:flex;gap:8px"><button class="btn light" style="flex:1" onclick="ticketCalc()">Calculate</button><button class="btn" style="flex:1" onclick="saveBooking()">Confirm Booking</button></div>
           </div>
         </div>
         <div class="card" style="margin-top:10px;background:linear-gradient(135deg,#f1f6ff,#fff)">
@@ -357,7 +345,7 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
       </div>
 
       <div class="mobile-scroll mobile-view" id="mFood">
-        <div class="section-title"><b>🍔 Stego Cafe</b><a>Cart (0)</a></div>
+        <div class="section-title"><b>🍔 Stego Cafe</b><a id="cartCount" href="#" onclick="openCart();return false;">Cart (0)</a></div>
         <div class="card" style="background:#fff7e7;border-color:#ffe4ad"><b style="font-size:12px">⚡ Stego Last Call</b><p style="font-size:10px;color:var(--muted);margin-bottom:0">Selected meals at special end-of-day prices to reduce food waste.</p></div>
         <div style="display:flex;gap:7px;overflow:auto;margin-top:10px;padding-bottom:2px">
           <button class="btn light" onclick="filterMenu('All')">All</button>
@@ -367,6 +355,14 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
           <button class="btn light" onclick="filterMenu('School Visit')">School</button>
         </div>
         <div id="customerFoodCards" style="display:grid;gap:10px;margin-top:10px"></div>
+        <div id="cartPanel" class="card" style="margin-top:12px;display:none">
+          <div class="section-title" style="margin:0 0 8px"><b>Your Cart</b><a href="#" onclick="clearCart();return false;">Clear</a></div>
+          <div id="cartItems"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)">
+            <div><small style="color:var(--muted)">Total</small><strong id="cartTotal" style="display:block;font-size:22px;color:var(--navy)">RM0.00</strong></div>
+            <button class="btn" onclick="checkoutCart()">Place Order</button>
+          </div>
+        </div>
       </div>
 
       <div class="mobile-scroll mobile-view" id="mRewards">
@@ -389,7 +385,7 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
             <input id="drinkQty" type="number" class="input" value="0" placeholder="Drinks">
           </div>
           <label style="font-size:10px"><input type="checkbox" id="private"> Private event 1 hour (+RM50)</label>
-          <button class="btn" onclick="schoolCalc()">Calculate Package</button>
+          <div style="display:flex;gap:8px"><button class="btn light" style="flex:1" onclick="schoolCalc()">Calculate</button><button class="btn" style="flex:1" onclick="submitSchoolVisit()">Submit Request</button></div>
           <strong id="schoolTotal" style="font-size:28px;color:var(--navy)">RM300.00</strong>
           <small style="font-size:9px;color:var(--muted)">RM10 / child • 5 teachers free • extra teacher RM5 • meal RM7.90 • drink RM1.90.</small>
         </div>
@@ -426,10 +422,10 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
       <div class="admin-content">
         <div class="view active" id="aDashboard">
           <div class="kpi-grid">
-            <div class="kpi"><span>Today's Revenue</span><strong>RM2,630</strong><em>↑ 18% vs yesterday</em></div>
-            <div class="kpi"><span>Visitors</span><strong>94</strong><em>Playground entries</em></div>
-            <div class="kpi"><span>Food Orders</span><strong>37</strong><em>6 currently preparing</em></div>
-            <div class="kpi"><span>New Members</span><strong>12</strong><em>RM120 membership sales</em></div>
+            <div class="kpi"><span>Today's Revenue</span><strong id="kpiRevenue">RM2,630</strong><em>Local prototype revenue</em></div>
+            <div class="kpi"><span>Visitors</span><strong id="kpiVisitors">94</strong><em>Saved ticket quantity</em></div>
+            <div class="kpi"><span>Food Orders</span><strong id="kpiOrders">37</strong><em>Saved food orders</em></div>
+            <div class="kpi"><span>New Members</span><strong id="kpiMembers">12</strong><em>Stego Nation members</em></div>
           </div>
           <div class="two-col">
             <div class="card">
@@ -481,19 +477,20 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
             <div class="backup-card"><div class="backup-icon"><span class="ui-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3"/><path d="M5 20c.8-4 3.3-6 7-6s6.2 2 7 6"/></svg></span></div><h3>Customer Database</h3><p>Portable customer database for Excel or Google Sheets. Stego keeps ownership of its customer data.</p><button class="btn light" onclick="exportMembers()">Export CSV</button></div>
             <div class="backup-card"><div class="backup-icon"><span class="ui-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-7"/><path d="M22 19H2"/></svg></span></div><h3>Business Exports</h3><p>Generate separate order and school-visit files for reporting or migration.</p><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn light" onclick="exportOrders()">Orders</button><button class="btn light" onclick="exportSchool()">School Visits</button></div></div>
             <div class="backup-card"><div class="backup-icon"><span class="ui-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="7" ry="3"/><path d="M5 5v6c0 1.7 3.1 3 7 3s7-1.3 7-3V5"/><path d="M5 11v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span></div><h3>Restore Backup</h3><p>Preview and restore a Stego backup. Restricted to owner role to avoid accidental database changes.</p><input type="file" id="restoreFile" class="input" accept=".json" style="margin-bottom:8px"><button class="btn red" onclick="restoreBackup()">Preview Restore</button></div>
+            <div class="backup-card"><div class="backup-icon"><span class="ui-icon"><svg viewBox="0 0 24 24"><path d="M4 4v6h6"/><path d="M5.5 10A8 8 0 1 0 8 5.3"/></svg></span></div><h3>Reset Demo Data</h3><p>Restore the local prototype to its original sample data.</p><button class="btn red" onclick="resetLocalData()">Reset Prototype</button></div>
           </div>
         </div>
 
         <div class="view" id="aSettings">
-          <div class="toolbar"><h3>Business Settings</h3><button class="btn" onclick="toast('Settings saved')">Save Changes</button></div>
+          <div class="toolbar"><h3>Business Settings</h3><button class="btn" onclick="saveSettings()">Save Changes</button></div>
           <div class="two-col">
             <div class="card">
               <h3>Contact & Brand</h3>
-              <div style="display:grid;gap:8px"><input class="input" value="Stego"><input class="input" value="018-2351000"><input class="input" value="@stegoland.playground"><input class="input" value="Stegoland, Pasir Tumboh"></div>
+              <div style="display:grid;gap:8px"><input class="input" id="settingName" value="Stego"><input class="input" id="settingPhone" value="018-2351000"><input class="input" id="settingSocial" value="@stegoland.playground"><input class="input" id="settingAddress" value="Stegoland, Pasir Tumboh"></div>
             </div>
             <div class="card">
               <h3>Stegoland Ticket Pricing</h3>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input class="input" value="14"><input class="input" value="19"><input class="input" value="23"><input class="input" value="5"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><input class="input" id="settingWeekday" value="14"><input class="input" id="settingWeekend" value="19"><input class="input" id="settingHoliday" value="23"><input class="input" id="settingGuardian" value="5"></div>
               <p style="font-size:9px;color:var(--muted)">Weekday • Weekend • PH/School Holiday • Guardian</p>
             </div>
           </div>
@@ -506,89 +503,417 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
 <div class="toast" id="toast"></div>
 
 <script>
-let menu = [
-{id:1,name:"Roti Bakar Kaya Butter",category:"Breakfast",price:5.30,available:true,description:"Breakfast menu"},
-{id:2,name:"Big Breakfast",category:"Breakfast",price:9.90,available:true,description:"Breakfast menu"},
-{id:3,name:"Telur Separuh Masak",category:"Breakfast",price:3.50,available:true,description:"Breakfast menu"},
-{id:4,name:"Nasi Bungkus",category:"Breakfast",price:5.00,priceNote:"RM5.00–RM5.50",available:true,description:"Breakfast menu"},
-{id:5,name:"Kuih-Muih",category:"Breakfast",price:2.50,available:true,description:"Breakfast menu"},
 
-{id:10,name:"Fried Chicken 1 pc",category:"Fried Chicken",price:4.50,available:true,description:"1 piece fried chicken"},
-{id:11,name:"Set A",category:"Fried Chicken",price:12.90,available:true,description:"1 pc fried chicken, fries, soft drink"},
-{id:12,name:"Set B",category:"Fried Chicken",price:17.90,available:true,description:"2 pcs fried chicken, fries, soft drink"},
-{id:13,name:"Family Fiesta",category:"Fried Chicken",price:39.00,available:true,description:"5 pcs fried chicken, large fries, 2 soft drinks"},
-{id:14,name:"Add On Rice",category:"Fried Chicken",price:1.00,available:true,description:"Rice add-on"},
+const STORAGE_KEY = 'stegoLocalPrototypeV1';
 
-{id:20,name:"Sausage Bun",category:"Snack",price:8.90,available:true,description:"Jasmine Cafe by Stego"},
+const defaultData = {
+  menu: [
+    {id:1,name:"Roti Bakar Kaya Butter",category:"Breakfast",price:5.30,available:true,description:"Breakfast menu"},
+    {id:2,name:"Big Breakfast",category:"Breakfast",price:9.90,available:true,description:"Breakfast menu"},
+    {id:3,name:"Telur Separuh Masak",category:"Breakfast",price:3.50,available:true,description:"Breakfast menu"},
+    {id:4,name:"Nasi Bungkus",category:"Breakfast",price:5.00,priceNote:"RM5.00–RM5.50",available:true,description:"Breakfast menu"},
+    {id:5,name:"Kuih-Muih",category:"Breakfast",price:2.50,available:true,description:"Breakfast menu"},
+    {id:10,name:"Fried Chicken 1 pc",category:"Fried Chicken",price:4.50,available:true,description:"1 piece fried chicken"},
+    {id:11,name:"Set A",category:"Fried Chicken",price:12.90,available:true,description:"1 pc fried chicken, fries, soft drink"},
+    {id:12,name:"Set B",category:"Fried Chicken",price:17.90,available:true,description:"2 pcs fried chicken, fries, soft drink"},
+    {id:13,name:"Family Fiesta",category:"Fried Chicken",price:39.00,available:true,description:"5 pcs fried chicken, large fries, 2 soft drinks"},
+    {id:14,name:"Add On Rice",category:"Fried Chicken",price:1.00,available:true,description:"Rice add-on"},
+    {id:20,name:"Sausage Bun",category:"Snack",price:8.90,available:true,description:"Jasmine Cafe by Stego"},
+    {id:30,name:"Twin Bite",category:"Combo",price:18.00,available:true,description:"Burger + chicken tenders + small corn + soft drink"},
+    {id:31,name:"Twin Bite • Cheese Burger",category:"Combo Upgrade",price:19.00,available:true,description:"Twin Bite upgraded to Cheese Burger"},
+    {id:32,name:"Twin Bite • Spicy Chicken Burger",category:"Combo Upgrade",price:20.00,available:true,description:"Twin Bite upgraded to Spicy Chicken Burger"},
+    {id:33,name:"Twin Bite • Biggo",category:"Combo Upgrade",price:22.00,available:true,description:"Twin Bite upgraded to Biggo"},
+    {id:34,name:"Twin Bite • Ziggo",category:"Combo Upgrade",price:24.00,available:true,description:"Twin Bite upgraded to Ziggo"},
+    {id:35,name:"Twin Bite • Fries Upgrade",category:"Add On",price:1.00,available:true,description:"Upgrade small corn to fries (+RM1)"},
+    {id:40,name:"Triple Bite",category:"Combo",price:21.00,available:true,description:"Burger + chicken tenders + nuggets + small corn + soft drink"},
+    {id:41,name:"Triple Bite • Cheese Burger",category:"Combo Upgrade",price:22.00,available:true,description:"Triple Bite upgraded to Cheese Burger"},
+    {id:42,name:"Triple Bite • Spicy Chicken Burger",category:"Combo Upgrade",price:23.00,available:true,description:"Triple Bite upgraded to Spicy Chicken Burger"},
+    {id:43,name:"Triple Bite • Biggo",category:"Combo Upgrade",price:24.00,available:true,description:"Triple Bite upgraded to Biggo"},
+    {id:44,name:"Triple Bite • Ziggo",category:"Combo Upgrade",price:25.00,available:true,description:"Triple Bite upgraded to Ziggo"},
+    {id:45,name:"Triple Bite • Fries Upgrade",category:"Add On",price:1.00,available:true,description:"Upgrade small corn to fries (+RM1)"},
+    {id:50,name:"Kids Meal",category:"School Visit",price:7.90,available:true,description:"Lemon chicken with butter rice"},
+    {id:51,name:"Iced Lemon Tea",category:"School Visit",price:1.90,available:true,description:"School visit soft drink add-on"}
+  ],
+  members: [
+    {id:"STG-000182",name:"Danial",phone:"01175956474",points:1280,totalSpend:645.50,joined:"2026-08-01"},
+    {id:"STG-000183",name:"Aina",phone:"0124455123",points:320,totalSpend:188.00,joined:"2026-08-03"},
+    {id:"STG-000184",name:"Hakim",phone:"0137754211",points:590,totalSpend:301.00,joined:"2026-08-05"}
+  ],
+  orders: [
+    {id:"ORD-1037",createdAt:"2026-08-18T09:20:00",items:[{name:"Twin Bite",qty:1,price:18}],total:18,status:"Paid"},
+    {id:"ORD-1038",createdAt:"2026-08-18T10:02:00",items:[{name:"Family Fiesta",qty:1,price:39}],total:39,status:"Ready"}
+  ],
+  bookings: [],
+  schoolVisits: [
+    {id:"SCH-001",school:"Tadika Ceria",students:45,teachers:6,total:843.50,status:"Pending",createdAt:"2026-08-18T08:30:00"}
+  ],
+  cart: [],
+  settings: {
+    businessName:"Stego",
+    phone:"018-2351000",
+    social:"@stegoland.playground",
+    address:"Stegoland, Pasir Tumboh",
+    weekday:14,
+    weekend:19,
+    holiday:23,
+    guardian:5
+  }
+};
 
-{id:30,name:"Twin Bite",category:"Combo",price:18.00,available:true,description:"Burger + chicken tenders + small corn + soft drink"},
-{id:31,name:"Twin Bite • Cheese Burger",category:"Combo Upgrade",price:19.00,available:true,description:"Twin Bite upgraded to Cheese Burger"},
-{id:32,name:"Twin Bite • Spicy Chicken Burger",category:"Combo Upgrade",price:20.00,available:true,description:"Twin Bite upgraded to Spicy Chicken Burger"},
-{id:33,name:"Twin Bite • Biggo",category:"Combo Upgrade",price:22.00,available:true,description:"Twin Bite upgraded to Biggo"},
-{id:34,name:"Twin Bite • Ziggo",category:"Combo Upgrade",price:24.00,available:true,description:"Twin Bite upgraded to Ziggo"},
-{id:35,name:"Twin Bite • Fries Upgrade",category:"Add On",price:1.00,available:true,description:"Upgrade small corn to fries (+RM1)"},
-
-{id:40,name:"Triple Bite",category:"Combo",price:21.00,available:true,description:"Burger + chicken tenders + nuggets + small corn + soft drink"},
-{id:41,name:"Triple Bite • Cheese Burger",category:"Combo Upgrade",price:22.00,available:true,description:"Triple Bite upgraded to Cheese Burger"},
-{id:42,name:"Triple Bite • Spicy Chicken Burger",category:"Combo Upgrade",price:23.00,available:true,description:"Triple Bite upgraded to Spicy Chicken Burger"},
-{id:43,name:"Triple Bite • Biggo",category:"Combo Upgrade",price:24.00,available:true,description:"Triple Bite upgraded to Biggo"},
-{id:44,name:"Triple Bite • Ziggo",category:"Combo Upgrade",price:25.00,available:true,description:"Triple Bite upgraded to Ziggo"},
-{id:45,name:"Triple Bite • Fries Upgrade",category:"Add On",price:1.00,available:true,description:"Upgrade small corn to fries (+RM1)"},
-
-{id:50,name:"Kids Meal",category:"School Visit",price:7.90,available:true,description:"Lemon chicken with butter rice"},
-{id:51,name:"Iced Lemon Tea",category:"School Visit",price:1.90,available:true,description:"School visit soft drink add-on"}
-];
-let members=[
-{id:"STG-000182",name:"Danial",phone:"01175956474",points:1280,totalSpend:645.50,joined:"2026-08-01"},
-{id:"STG-000183",name:"Aina",phone:"0124455123",points:320,totalSpend:188.00,joined:"2026-08-03"},
-{id:"STG-000184",name:"Hakim",phone:"0137754211",points:590,totalSpend:301.00,joined:"2026-08-05"}
-];
-let orders=[{id:"ORD-1037",total:19,status:"Paid"},{id:"ORD-1038",total:39,status:"Ready"}];
-let schoolVisits=[{school:"Tadika Ceria",students:45,teachers:6,total:843.50,status:"Pending"}];
+function deepClone(obj){ return JSON.parse(JSON.stringify(obj)); }
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return deepClone(defaultData);
+    const parsed = JSON.parse(raw);
+    return {...deepClone(defaultData), ...parsed};
+  }catch(e){
+    console.warn('Local data load failed', e);
+    return deepClone(defaultData);
+  }
+}
+let appData = loadData();
+let menu = appData.menu;
+let members = appData.members;
+let orders = appData.orders;
+let bookings = appData.bookings || [];
+let schoolVisits = appData.schoolVisits;
+let cart = appData.cart || [];
+let settings = appData.settings || deepClone(defaultData.settings);
 let editingId=null;
-
-function toast(msg){let t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1500)}
-function mobileView(id,btn){document.querySelectorAll('.mobile-view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');if(btn){document.querySelectorAll('.bottom-nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}}
-function adminView(id,btn){document.querySelectorAll('.admin-content .view').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}
-document.getElementById('customerMode').onclick=()=>{document.getElementById('customerMode').classList.add('active');document.getElementById('adminMode').classList.remove('active');document.querySelector('.phone').scrollIntoView({behavior:'smooth'})};
-document.getElementById('adminMode').onclick=()=>{document.getElementById('adminMode').classList.add('active');document.getElementById('customerMode').classList.remove('active');document.querySelector('.workspace').scrollIntoView({behavior:'smooth'})};
-
-function ticketCalc(){let p=+document.getElementById('ticketPrice').value,k=+document.getElementById('kidQty').value||0,g=+document.getElementById('guardianQty').value||0;document.getElementById('ticketTotal').textContent='RM'+(p*k+5*g).toFixed(2)}
-function schoolCalc(){let s=+document.getElementById('students').value||0,t=+document.getElementById('teachers').value||0,m=+document.getElementById('mealQty').value||0,d=+document.getElementById('drinkQty').value||0,pr=document.getElementById('private').checked?50:0;document.getElementById('schoolTotal').textContent='RM'+(s*10+Math.max(0,t-5)*5+m*7.9+d*1.9+pr).toFixed(2)}
 let activeMenuFilter='All';
+
+function persist(){
+  appData = {menu,members,orders,bookings,schoolVisits,cart,settings};
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+  refreshDashboard();
+}
+
+function toast(msg){
+  let t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1600)
+}
+
+function mobileView(id,btn){
+  document.querySelectorAll('.mobile-view').forEach(x=>x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(btn){
+    document.querySelectorAll('.bottom-nav button').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active')
+  }
+}
+function adminView(id,btn){
+  document.querySelectorAll('.admin-content .view').forEach(x=>x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.admin-tabs button').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active')
+}
+
+document.getElementById('customerMode').onclick=()=>{
+  document.getElementById('customerMode').classList.add('active');
+  document.getElementById('adminMode').classList.remove('active');
+  document.querySelector('.phone').scrollIntoView({behavior:'smooth'})
+};
+document.getElementById('adminMode').onclick=()=>{
+  document.getElementById('adminMode').classList.add('active');
+  document.getElementById('customerMode').classList.remove('active');
+  document.querySelector('.workspace').scrollIntoView({behavior:'smooth'})
+};
+
+function getTicketPrice(){
+  return +document.getElementById('ticketPrice').value || settings.weekday;
+}
+function ticketCalc(){
+  let p=getTicketPrice(),
+      k=+document.getElementById('kidQty').value||0,
+      g=+document.getElementById('guardianQty').value||0;
+  document.getElementById('ticketTotal').textContent='RM'+(p*k+settings.guardian*g).toFixed(2)
+}
+function saveBooking(){
+  const date = document.getElementById('date').value;
+  const kids = +document.getElementById('kidQty').value||0;
+  const guardians = +document.getElementById('guardianQty').value||0;
+  const price = getTicketPrice();
+  if(!date) return toast('Choose a visit date');
+  if(kids+guardians<=0) return toast('Choose at least one ticket');
+  const total = price*kids + settings.guardian*guardians;
+  bookings.unshift({
+    id:'TKT-'+Date.now().toString().slice(-7),
+    date,kids,guardians,ticketPrice:price,total,
+    status:'Confirmed',createdAt:new Date().toISOString()
+  });
+  persist();
+  ticketCalc();
+  toast('Booking saved locally');
+}
+
+function schoolCalc(){
+  let s=+document.getElementById('students').value||0,
+      t=+document.getElementById('teachers').value||0,
+      m=+document.getElementById('mealQty').value||0,
+      d=+document.getElementById('drinkQty').value||0,
+      pr=document.getElementById('private').checked?50:0;
+  const total=s*10+Math.max(0,t-5)*5+m*7.9+d*1.9+pr;
+  document.getElementById('schoolTotal').textContent='RM'+total.toFixed(2);
+  return total;
+}
+function submitSchoolVisit(){
+  const school = document.getElementById('schoolName').value.trim();
+  const students = +document.getElementById('students').value||0;
+  const teachers = +document.getElementById('teachers').value||0;
+  if(!school) return toast('Enter school name');
+  if(students<=0) return toast('Enter number of students');
+  schoolVisits.unshift({
+    id:'SCH-'+Date.now().toString().slice(-6),
+    school,students,teachers,
+    meals:+document.getElementById('mealQty').value||0,
+    drinks:+document.getElementById('drinkQty').value||0,
+    privateEvent:document.getElementById('private').checked,
+    total:schoolCalc(),status:'Pending',
+    createdAt:new Date().toISOString()
+  });
+  persist();
+  renderSchoolAdmin();
+  toast('School visit request saved');
+}
+
 function getFilteredMenu(){
- return activeMenuFilter==='All' ? menu : menu.filter(x=>x.category===activeMenuFilter || (activeMenuFilter==='Combo' && (x.category==='Combo'||x.category==='Combo Upgrade'||x.category==='Add On')));
+  return activeMenuFilter==='All'
+    ? menu
+    : menu.filter(x=>x.category===activeMenuFilter || (activeMenuFilter==='Combo' && (x.category==='Combo'||x.category==='Combo Upgrade'||x.category==='Add On')));
 }
 function filterMenu(cat){ activeMenuFilter=cat; renderMenu(); }
-function renderMenu(){
- document.getElementById('menuRows').innerHTML=menu.map(x=>`<tr><td><b>${x.name}</b><br><small style="color:var(--muted)">${x.description||''}</small></td><td>${x.category}</td><td>${x.priceNote||('RM'+x.price.toFixed(2))}</td><td><span class="status ${x.available?'':'sold'}">${x.available?'Available':'Sold Out'}</span></td><td><button class="btn light" onclick="editFood(${x.id})">Edit</button> <button class="btn red" onclick="toggleFood(${x.id})">${x.available?'Sold Out':'Enable'}</button></td></tr>`).join('');
- let cards=getFilteredMenu().map(x=>`<div class="card" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
-<div style="min-width:0"><b style="font-size:12px">${x.name}</b>
-<small style="display:block;color:var(--muted);font-size:9px;margin-top:3px">${x.category} • ${x.available?'Available':'Sold Out'}</small>
-<small style="display:block;color:var(--muted);font-size:9px;line-height:1.45;margin-top:4px">${x.description||''}</small></div>
-<div style="text-align:right;flex:0 0 auto"><strong style="font-size:13px;color:var(--navy)">${x.priceNote||('RM'+x.price.toFixed(2))}</strong><br><button class="btn light" ${x.available?'':'disabled'} style="margin-top:6px">Add</button></div></div>`).join('');
- document.getElementById('customerFoodCards').innerHTML=cards;
-}
-function addFood(){editingId=null;document.getElementById('editName').value='';document.getElementById('editPrice').value='';document.getElementById('editCategory').value='Breakfast';toast('Ready to add new menu item')}
-function editFood(id){let x=menu.find(m=>m.id===id);editingId=id;document.getElementById('editName').value=x.name;document.getElementById('editPrice').value=x.price;document.getElementById('editCategory').value=x.category;toast('Editing '+x.name)}
-function saveFood(){let name=document.getElementById('editName').value.trim(),price=parseFloat(document.getElementById('editPrice').value),category=document.getElementById('editCategory').value;if(!name||isNaN(price))return toast('Enter item name and price');if(editingId)Object.assign(menu.find(x=>x.id===editingId),{name,price,category});else menu.push({id:Date.now(),name,price,category,available:true});renderMenu();toast('Menu updated')}
-function toggleFood(id){let x=menu.find(m=>m.id===id);x.available=!x.available;renderMenu();toast(x.name+' updated')}
-function renderMembers(q=''){let arr=members.filter(m=>(m.id+m.name+m.phone).toLowerCase().includes(q.toLowerCase()));document.getElementById('memberRows').innerHTML=arr.map(m=>`<tr><td><b>${m.name}</b><br><small>${m.id}</small></td><td>${m.phone}</td><td>${m.points}</td><td>RM${m.totalSpend.toFixed(2)}</td><td>${m.joined}</td></tr>`).join('')}
-function download(name,text,type){let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
-function csv(rows){if(!rows.length)return '';let keys=Object.keys(rows[0]);return [keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\n')}
-function exportMembers(){download('stego-members.csv',csv(members),'text/csv');toast('Customer database exported')}
-function exportOrders(){download('stego-orders.csv',csv(orders),'text/csv');toast('Orders exported')}
-function exportSchool(){download('stego-school-visits.csv',csv(schoolVisits),'text/csv');toast('School visits exported')}
-function backupJSON(){let data={exportedAt:new Date().toISOString(),members,menu,orders,schoolVisits,settings:{weekday:14,weekend:19,holiday:23,guardian:5,phone:'018-2351000'}};download('stego-full-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(data,null,2),'application/json');toast('Full backup downloaded')}
-function restoreBackup(){let f=document.getElementById('restoreFile').files[0];if(!f)return toast('Choose a JSON backup');let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(confirm(`Backup contains ${(d.members||[]).length} members and ${(d.menu||[]).length} menu items. Restore prototype data?`)){if(d.members)members=d.members;if(d.menu)menu=d.menu;if(d.orders)orders=d.orders;if(d.schoolVisits)schoolVisits=d.schoolVisits;renderMenu();renderMembers();toast('Backup restored')}}catch(e){toast('Invalid backup file')}};r.readAsText(f)}
 
-renderMenu();renderMembers();ticketCalc();schoolCalc();
+function addToCart(id){
+  const item = menu.find(x=>x.id===id);
+  if(!item || !item.available) return;
+  const existing = cart.find(x=>x.id===id);
+  if(existing) existing.qty += 1;
+  else cart.push({id:item.id,name:item.name,price:item.price,qty:1});
+  persist();
+  renderCart();
+  toast(item.name+' added');
+}
+function changeCartQty(id,delta){
+  const item=cart.find(x=>x.id===id);
+  if(!item)return;
+  item.qty+=delta;
+  if(item.qty<=0) cart=cart.filter(x=>x.id!==id);
+  persist();renderCart();
+}
+function clearCart(){ cart=[]; persist(); renderCart(); }
+function openCart(){
+  const p=document.getElementById('cartPanel');
+  p.style.display='block';
+  p.scrollIntoView({behavior:'smooth'});
+}
+function renderCart(){
+  const count=cart.reduce((a,b)=>a+b.qty,0);
+  const total=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  document.getElementById('cartCount').textContent='Cart ('+count+')';
+  document.getElementById('cartTotal').textContent='RM'+total.toFixed(2);
+  document.getElementById('cartItems').innerHTML = cart.length
+    ? cart.map(x=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)">
+      <div><b style="font-size:11px">${x.name}</b><small style="display:block;color:var(--muted)">RM${x.price.toFixed(2)}</small></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn light" onclick="changeCartQty(${x.id},-1)">−</button>
+        <b>${x.qty}</b>
+        <button class="btn light" onclick="changeCartQty(${x.id},1)">+</button>
+      </div>
+    </div>`).join('')
+    : '<small style="color:var(--muted)">Your cart is empty.</small>';
+}
+function checkoutCart(){
+  if(!cart.length) return toast('Cart is empty');
+  const total=cart.reduce((a,b)=>a+b.price*b.qty,0);
+  orders.unshift({
+    id:'ORD-'+Date.now().toString().slice(-6),
+    createdAt:new Date().toISOString(),
+    items:deepClone(cart),total,status:'New'
+  });
+  cart=[];
+  persist();
+  renderCart();
+  toast('Order placed and saved locally');
+}
+
+function renderMenu(){
+  document.getElementById('menuRows').innerHTML=menu.map(x=>`<tr>
+    <td><b>${x.name}</b><br><small style="color:var(--muted)">${x.description||''}</small></td>
+    <td>${x.category}</td>
+    <td>${x.priceNote||('RM'+x.price.toFixed(2))}</td>
+    <td><span class="status ${x.available?'':'sold'}">${x.available?'Available':'Sold Out'}</span></td>
+    <td><button class="btn light" onclick="editFood(${x.id})">Edit</button> <button class="btn red" onclick="toggleFood(${x.id})">${x.available?'Sold Out':'Enable'}</button></td>
+  </tr>`).join('');
+
+  document.getElementById('customerFoodCards').innerHTML=getFilteredMenu().map(x=>`<div class="card" style="display:flex;justify-content:space-between;gap:12px;align-items:center">
+    <div style="min-width:0">
+      <b style="font-size:12px">${x.name}</b>
+      <small style="display:block;color:var(--muted);font-size:9px;margin-top:3px">${x.category} • ${x.available?'Available':'Sold Out'}</small>
+      <small style="display:block;color:var(--muted);font-size:9px;line-height:1.45;margin-top:4px">${x.description||''}</small>
+    </div>
+    <div style="text-align:right;flex:0 0 auto">
+      <strong style="font-size:13px;color:var(--navy)">${x.priceNote||('RM'+x.price.toFixed(2))}</strong><br>
+      <button class="btn light" ${x.available?'':'disabled'} style="margin-top:6px" onclick="addToCart(${x.id})">Add</button>
+    </div>
+  </div>`).join('');
+}
+
+function addFood(){
+  editingId=null;
+  document.getElementById('editName').value='';
+  document.getElementById('editPrice').value='';
+  document.getElementById('editCategory').value='Breakfast';
+  toast('Ready to add new menu item')
+}
+function editFood(id){
+  let x=menu.find(m=>m.id===id);
+  editingId=id;
+  document.getElementById('editName').value=x.name;
+  document.getElementById('editPrice').value=x.price;
+  document.getElementById('editCategory').value=x.category;
+  toast('Editing '+x.name)
+}
+function saveFood(){
+  let name=document.getElementById('editName').value.trim(),
+      price=parseFloat(document.getElementById('editPrice').value),
+      category=document.getElementById('editCategory').value;
+  if(!name||isNaN(price))return toast('Enter item name and price');
+  if(editingId) Object.assign(menu.find(x=>x.id===editingId),{name,price,category});
+  else menu.push({id:Date.now(),name,price,category,available:true,description:''});
+  persist();renderMenu();toast('Menu updated and saved')
+}
+function toggleFood(id){
+  let x=menu.find(m=>m.id===id);
+  x.available=!x.available;
+  persist();renderMenu();toast(x.name+' updated')
+}
+
+function renderMembers(q=''){
+  let arr=members.filter(m=>(m.id+m.name+m.phone).toLowerCase().includes(q.toLowerCase()));
+  document.getElementById('memberRows').innerHTML=arr.map(m=>`<tr>
+    <td><b>${m.name}</b><br><small>${m.id}</small></td>
+    <td>${m.phone}</td><td>${m.points}</td><td>RM${m.totalSpend.toFixed(2)}</td><td>${m.joined}</td>
+  </tr>`).join('')
+}
+function renderSchoolAdmin(){
+  // The current prototype does not yet have a dedicated table, but data is persisted and exported.
+}
+function refreshDashboard(){
+  const today = new Date().toISOString().slice(0,10);
+  const todayOrders = orders.filter(x=>(x.createdAt||'').slice(0,10)===today);
+  const todayBookings = bookings.filter(x=>(x.createdAt||'').slice(0,10)===today);
+  const orderRevenue = todayOrders.reduce((a,b)=>a+(+b.total||0),0);
+  const ticketRevenue = todayBookings.reduce((a,b)=>a+(+b.total||0),0);
+  const visitors = todayBookings.reduce((a,b)=>a+(+b.kids||0)+(+b.guardians||0),0);
+
+  const r=document.getElementById('kpiRevenue');
+  const v=document.getElementById('kpiVisitors');
+  const o=document.getElementById('kpiOrders');
+  const m=document.getElementById('kpiMembers');
+  if(r) r.textContent='RM'+(orderRevenue+ticketRevenue).toFixed(2);
+  if(v) v.textContent=visitors;
+  if(o) o.textContent=todayOrders.length;
+  if(m) m.textContent=members.length;
+}
+
+function loadSettingsIntoUI(){
+  const vals={
+    settingName:settings.businessName,
+    settingPhone:settings.phone,
+    settingSocial:settings.social,
+    settingAddress:settings.address,
+    settingWeekday:settings.weekday,
+    settingWeekend:settings.weekend,
+    settingHoliday:settings.holiday,
+    settingGuardian:settings.guardian
+  };
+  Object.entries(vals).forEach(([id,val])=>{
+    const el=document.getElementById(id);
+    if(el) el.value=val;
+  });
+  const ticketSelect=document.getElementById('ticketPrice');
+  if(ticketSelect){
+    ticketSelect.innerHTML=`
+      <option value="${settings.weekday}">Weekday • RM${settings.weekday}</option>
+      <option value="${settings.weekend}">Weekend • RM${settings.weekend}</option>
+      <option value="${settings.holiday}">PH / School Holiday • RM${settings.holiday}</option>`;
+  }
+}
+function saveSettings(){
+  settings={
+    businessName:document.getElementById('settingName').value.trim()||'Stego',
+    phone:document.getElementById('settingPhone').value.trim(),
+    social:document.getElementById('settingSocial').value.trim(),
+    address:document.getElementById('settingAddress').value.trim(),
+    weekday:+document.getElementById('settingWeekday').value||14,
+    weekend:+document.getElementById('settingWeekend').value||19,
+    holiday:+document.getElementById('settingHoliday').value||23,
+    guardian:+document.getElementById('settingGuardian').value||5
+  };
+  persist();loadSettingsIntoUI();ticketCalc();toast('Settings saved locally')
+}
+
+function download(name,text,type){
+  let a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type}));
+  a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),500)
+}
+function csv(rows){
+  if(!rows.length)return '';
+  let keys=Object.keys(rows[0]);
+  return [keys.join(','),...rows.map(r=>keys.map(k=>`"${String(r[k]??'').replaceAll('"','""')}"`).join(','))].join('\n')
+}
+function exportMembers(){download('stego-members.csv',csv(members),'text/csv');toast('Customer database exported')}
+function exportOrders(){
+  const flat=orders.map(o=>({id:o.id,createdAt:o.createdAt,total:o.total,status:o.status,items:(o.items||[]).map(i=>`${i.name} x${i.qty}`).join(' | ')}));
+  download('stego-orders.csv',csv(flat),'text/csv');toast('Orders exported')
+}
+function exportSchool(){download('stego-school-visits.csv',csv(schoolVisits),'text/csv');toast('School visits exported')}
+function backupJSON(){
+  persist();
+  download('stego-full-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(appData,null,2),'application/json');
+  toast('Full local backup downloaded')
+}
+function restoreBackup(){
+  let f=document.getElementById('restoreFile').files[0];
+  if(!f)return toast('Choose a JSON backup');
+  let r=new FileReader();
+  r.onload=()=>{
+    try{
+      let d=JSON.parse(r.result);
+      if(confirm(`Backup contains ${(d.members||[]).length} members and ${(d.menu||[]).length} menu items. Restore local prototype data?`)){
+        appData={...deepClone(defaultData),...d};
+        menu=appData.menu;members=appData.members;orders=appData.orders;bookings=appData.bookings||[];
+        schoolVisits=appData.schoolVisits;cart=appData.cart||[];settings=appData.settings;
+        persist();renderMenu();renderMembers();renderCart();loadSettingsIntoUI();toast('Backup restored')
+      }
+    }catch(e){toast('Invalid backup file')}
+  };
+  r.readAsText(f)
+}
+function resetLocalData(){
+  if(!confirm('Reset this browser prototype to the original sample data?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+loadSettingsIntoUI();
+renderMenu();
+renderMembers();
+renderCart();
+ticketCalc();
+schoolCalc();
+refreshDashboard();
+
 </script>
 
 <script>
 window.addEventListener('load', () => {
   const splash = document.getElementById('stegoSplash');
-  const minSplash = 3650;
+  const minSplash = 4200;
   setTimeout(() => {
     if (splash) {
       splash.classList.add('hide');

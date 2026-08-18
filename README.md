@@ -26,3 +26,6 @@ Data stays on the same browser/device only. Clearing browser site data will remo
 ## GitHub Pages
 Upload every file in this folder to the repository root and enable GitHub Pages from `main` / root.
 
+
+- Fixed rocket splash animation conflict by separating desktop and mobile keyframes.
+- Rocket now travels from lower-left to upper-right instead of staying parked.

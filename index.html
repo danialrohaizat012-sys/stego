@@ -190,7 +190,7 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
 
 .flight-wrap{
   position:absolute;left:-7%;bottom:8%;width:335px;height:335px;
-  animation:flyToStego 4.15s cubic-bezier(.18,.72,.22,1) forwards;
+  animation:flyToStegoDesktop 4.15s cubic-bezier(.18,.72,.22,1) forwards;
   will-change:transform,opacity;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
@@ -212,16 +212,17 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.82));
   box-shadow:0 -28px 0 rgba(255,255,255,.22),0 31px 0 rgba(255,255,255,.16)
 }
-@keyframes shipBob{from{transform:translate3d(0,0,0) rotate(-.6deg)}to{transform:translate3d(0,-4px,0) rotate(.6deg)}}
+@keyframes shipBob{from{transform:translate3d(0,0,0) rotate(-.35deg)}to{transform:translate3d(0,-2px,0) rotate(.35deg)}}
 @keyframes flame{from{transform:rotate(-12deg) scaleX(.72)}to{transform:rotate(-12deg) scaleX(1.12)}}
-@keyframes flyToStego{
-  0%   {transform:translate3d(-34vw,18vh,0) rotate(-12deg) scale(.76);opacity:0}
-  8%   {opacity:1}
-  28%  {transform:translate3d(6vw,3vh,0) rotate(-10deg) scale(.93)}
-  52%  {transform:translate3d(34vw,-15vh,0) rotate(-7deg) scale(.86)}
-  74%  {transform:translate3d(58vw,-30vh,0) rotate(-4deg) scale(.63)}
-  90%  {transform:translate3d(76vw,-43vh,0) rotate(-1deg) scale(.38);opacity:1}
-  100% {transform:translate3d(91vw,-55vh,0) rotate(0deg) scale(.18);opacity:0}
+@keyframes flyToStegoDesktop{
+  0%   {transform:translate3d(-42vw,26vh,0) rotate(-13deg) scale(.74);opacity:0}
+  7%   {opacity:1}
+  18%  {transform:translate3d(-12vw,14vh,0) rotate(-11deg) scale(.88)}
+  36%  {transform:translate3d(12vw,2vh,0) rotate(-9deg) scale(.96)}
+  56%  {transform:translate3d(38vw,-15vh,0) rotate(-6deg) scale(.88)}
+  74%  {transform:translate3d(61vw,-31vh,0) rotate(-3deg) scale(.66)}
+  90%  {transform:translate3d(80vw,-46vh,0) rotate(-1deg) scale(.38);opacity:1}
+  100% {transform:translate3d(96vw,-60vh,0) rotate(0deg) scale(.16);opacity:0}
 }
 .splash-copy{
   position:absolute;left:0;right:0;bottom:8.5%;text-align:center;color:#fff;padding:0 24px;
@@ -237,15 +238,16 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
   .destination{right:5%;top:18%;width:104px;height:104px}
   .destination:before{top:43px}
   .destination-label{right:2.5%;top:calc(18% + 120px);font-size:11px}
-  .flight-wrap{width:285px;height:285px;left:-12%;bottom:13%}
-  @keyframes flyToStego{
-    0%   {transform:translate3d(-68vw,19vh,0) rotate(-12deg) scale(.72);opacity:0}
-    8%   {opacity:1}
-    30%  {transform:translate3d(2vw,4vh,0) rotate(-10deg) scale(.94)}
-    54%  {transform:translate3d(34vw,-14vh,0) rotate(-7deg) scale(.84)}
-    75%  {transform:translate3d(58vw,-29vh,0) rotate(-4deg) scale(.61)}
-    91%  {transform:translate3d(80vw,-43vh,0) rotate(-1deg) scale(.34);opacity:1}
-    100% {transform:translate3d(98vw,-55vh,0) rotate(0deg) scale(.16);opacity:0}
+  .flight-wrap{width:285px;height:285px;left:-12%;bottom:13%;animation:flyToStegoMobile 4.15s cubic-bezier(.18,.72,.22,1) forwards}
+  @keyframes flyToStegoMobile{
+    0%   {transform:translate3d(-82vw,27vh,0) rotate(-13deg) scale(.72);opacity:0}
+    7%   {opacity:1}
+    18%  {transform:translate3d(-28vw,15vh,0) rotate(-11deg) scale(.86)}
+    36%  {transform:translate3d(4vw,3vh,0) rotate(-9deg) scale(.95)}
+    56%  {transform:translate3d(34vw,-14vh,0) rotate(-6deg) scale(.86)}
+    74%  {transform:translate3d(61vw,-31vh,0) rotate(-3deg) scale(.63)}
+    90%  {transform:translate3d(84vw,-47vh,0) rotate(-1deg) scale(.34);opacity:1}
+    100% {transform:translate3d(108vw,-61vh,0) rotate(0deg) scale(.14);opacity:0}
   }
 }
 </style>
@@ -913,7 +915,7 @@ refreshDashboard();
 <script>
 window.addEventListener('load', () => {
   const splash = document.getElementById('stegoSplash');
-  const minSplash = 4200;
+  const minSplash = 4250;
   setTimeout(() => {
     if (splash) {
       splash.classList.add('hide');

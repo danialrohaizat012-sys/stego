@@ -1,31 +1,9 @@
-# Stego Platform PWA — Local Working Prototype
+# Stego Platform PWA v14
 
-Deploy-ready GitHub Pages build.
+Same visible branding and UI as v12.
 
-## What's working now
-- PWA install + service worker
-- Smooth astronaut/rocket splash animation
-- No planet graphic in splash
-- Customer food cart
-- Local food orders
-- Local Stegoland ticket bookings
-- Local school-visit requests
-- Admin menu edit / add / sold-out controls
-- Admin settings
-- Member database
-- Dashboard KPIs calculated from locally saved activity
-- JSON full backup / restore
-- CSV member, order and school-visit exports
-- LocalStorage persistence across browser refreshes
+Only the installed PWA/app name under the home-screen icon has been changed to:
 
-## Storage
-This version uses browser `localStorage`, so it is ideal for prototyping before Firebase.
+STEGO
 
-Data stays on the same browser/device only. Clearing browser site data will remove it unless a JSON backup is exported first.
-
-## GitHub Pages
-Upload every file in this folder to the repository root and enable GitHub Pages from `main` / root.
-
-
-- Fixed rocket splash animation conflict by separating desktop and mobile keyframes.
-- Rocket now travels from lower-left to upper-right instead of staying parked.
+Stegoland and the existing platform/dashboard wording remain unchanged.

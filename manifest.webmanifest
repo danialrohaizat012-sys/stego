@@ -1,6 +1,6 @@
 {
-  "name": "Stego Platform",
-  "short_name": "Stego",
+  "name": "STEGO",
+  "short_name": "STEGO",
   "description": "Stego Nation membership, Stegoland booking, cafe ordering, rewards, school visits and admin tools.",
   "start_url": "./",
   "scope": "./",

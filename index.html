@@ -160,7 +160,7 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Stego">
+<meta name="apple-mobile-web-app-title" content="STEGO">
 
 
 <style>
@@ -252,20 +252,388 @@ th,td{padding:11px;border-bottom:1px solid var(--line);text-align:left} th{font-
 }
 </style>
 
+
+<style>
+#stegoSplash{
+  position:fixed;inset:0;z-index:99999;overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 78%,rgba(34,89,214,.30),transparent 34%),
+    radial-gradient(circle at 82% 18%,rgba(63,38,168,.24),transparent 29%),
+    linear-gradient(155deg,#06112f 0%,#0b1f52 52%,#0d2f77 100%);
+  transition:opacity .58s ease,visibility .58s ease;
+}
+#stegoSplash.hide{opacity:0;visibility:hidden}
+#stegoSplash .space-stars,
+#stegoSplash .space-stars:before,
+#stegoSplash .space-stars:after{
+  content:"";position:absolute;inset:-20%;
+  background-image:radial-gradient(circle,#fff 0 1px,transparent 1.5px);
+  background-size:62px 62px;opacity:.28;
+  animation:stegoStarDrift 9s linear infinite;
+}
+#stegoSplash .space-stars:before{background-size:91px 91px;opacity:.17;animation-duration:13s}
+#stegoSplash .space-stars:after{background-size:137px 137px;opacity:.11;animation-duration:18s}
+@keyframes stegoStarDrift{to{transform:translate3d(-110px,70px,0)}}
+.splash-glow{position:absolute;border-radius:50%;filter:blur(24px);opacity:.35}
+.glow-one{width:220px;height:220px;left:-60px;bottom:10%;background:#1b64ff}
+.glow-two{width:180px;height:180px;right:-50px;top:7%;background:#5b34d8}
+
+.flight-wrap{
+  position:absolute;
+  width:min(48vw,370px);height:min(76vh,640px);
+  left:-29vw;bottom:-24vh;
+  z-index:5;will-change:transform,opacity;backface-visibility:hidden;
+  animation:stegoRocketFlight 4.65s cubic-bezier(.16,.68,.18,1) forwards;
+}
+.flight-logo{
+  width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 24px 34px rgba(0,0,0,.38));
+  animation:stegoRocketFloat .78s ease-in-out infinite alternate;
+}
+@keyframes stegoRocketFloat{
+  from{transform:translate3d(0,0,0) rotate(-.7deg)}
+  to{transform:translate3d(0,-4px,0) rotate(.7deg)}
+}
+@keyframes stegoRocketFlight{
+  0%   {transform:translate3d(-5vw,10vh,0) rotate(-11deg) scale(.72);opacity:0}
+  7%   {opacity:1}
+  20%  {transform:translate3d(17vw,0vh,0) rotate(-9deg) scale(.86)}
+  38%  {transform:translate3d(39vw,-14vh,0) rotate(-7deg) scale(.95)}
+  58%  {transform:translate3d(61vw,-31vh,0) rotate(-5deg) scale(.86)}
+  77%  {transform:translate3d(80vw,-48vh,0) rotate(-3deg) scale(.64)}
+  92%  {transform:translate3d(97vw,-65vh,0) rotate(-1deg) scale(.38);opacity:1}
+  100% {transform:translate3d(113vw,-78vh,0) rotate(0deg) scale(.18);opacity:0}
+}
+
+.smoke-layer{position:absolute;inset:0;z-index:3;pointer-events:none}
+.smoke{
+  position:absolute;left:4%;bottom:4%;width:44px;height:44px;border-radius:50%;
+  background:radial-gradient(circle at 36% 32%,rgba(255,255,255,.94),rgba(225,235,255,.70) 50%,rgba(158,180,235,.08) 72%,transparent 74%);
+  opacity:0;animation:stegoSmoke 2.9s ease-out forwards;
+}
+.s2{animation-delay:.16s;left:9%;bottom:8%;width:54px;height:54px}
+.s3{animation-delay:.35s;left:15%;bottom:13%;width:48px;height:48px}
+.s4{animation-delay:.62s;left:22%;bottom:20%;width:58px;height:58px}
+.s5{animation-delay:.90s;left:30%;bottom:28%;width:46px;height:46px}
+.s6{animation-delay:1.2s;left:38%;bottom:36%;width:38px;height:38px}
+@keyframes stegoSmoke{
+  0%{transform:translate3d(-16px,18px,0) scale(.25);opacity:0}
+  18%{opacity:.74}
+  62%{opacity:.40}
+  100%{transform:translate3d(-28px,44px,0) scale(2.55);opacity:0}
+}
+
+.splash-brand{position:absolute;left:0;right:0;top:12%;text-align:center;color:#fff;z-index:8}
+.splash-title{font-size:clamp(28px,6vw,48px);font-weight:1000;letter-spacing:.08em;text-shadow:0 8px 28px rgba(0,0,0,.35)}
+.splash-sub{margin-top:5px;font-size:12px;letter-spacing:.08em;color:#dbe7ff}
+.splash-copy{position:absolute;left:50%;bottom:8%;transform:translateX(-50%);width:min(78%,410px);text-align:center;color:#fff;z-index:10}
+.splash-copy b{display:block;font-size:12px;margin-bottom:10px}
+.splash-progress{height:8px;border-radius:999px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.18);overflow:hidden}
+.splash-progress span{display:block;height:100%;width:0%;border-radius:inherit;background:linear-gradient(90deg,#ffc928,#ffda62,#ffae27);box-shadow:0 0 14px rgba(255,201,40,.42);transition:width .42s cubic-bezier(.22,.75,.22,1)}
+
+@media(max-width:600px){
+  .flight-wrap{
+    width:72vw;height:78vh;left:-55vw;bottom:-28vh;
+    animation:stegoRocketFlightMobile 4.65s cubic-bezier(.16,.68,.18,1) forwards;
+  }
+  @keyframes stegoRocketFlightMobile{
+    0%   {transform:translate3d(-2vw,11vh,0) rotate(-11deg) scale(.66);opacity:0}
+    7%   {opacity:1}
+    20%  {transform:translate3d(33vw,0vh,0) rotate(-9deg) scale(.82)}
+    38%  {transform:translate3d(63vw,-15vh,0) rotate(-7deg) scale(.93)}
+    58%  {transform:translate3d(89vw,-31vh,0) rotate(-5deg) scale(.83)}
+    76%  {transform:translate3d(111vw,-47vh,0) rotate(-3deg) scale(.60)}
+    91%  {transform:translate3d(132vw,-63vh,0) rotate(-1deg) scale(.34);opacity:1}
+    100% {transform:translate3d(149vw,-76vh,0) rotate(0deg) scale(.14);opacity:0}
+  }
+  .splash-brand{top:13%}
+  .splash-copy{bottom:7%;width:74%}
+}
+</style>
+
+
+<style>
+/* ===== STEGO FLUID ROCKET V8 ===== */
+.flight-wrap{
+  position:absolute !important;
+  left:0 !important;
+  top:0 !important;
+  bottom:auto !important;
+  width:clamp(210px,38vw,330px) !important;
+  height:clamp(260px,52vh,480px) !important;
+  z-index:6 !important;
+  animation:none !important;
+  will-change:transform,opacity !important;
+  transform-origin:52% 62%;
+  pointer-events:none;
+}
+.flight-logo{
+  width:100%;height:100%;object-fit:contain;
+  animation:none !important;
+  filter:drop-shadow(0 18px 28px rgba(0,0,0,.34));
+}
+.smoke-layer{position:absolute;inset:0;z-index:4;overflow:hidden;pointer-events:none}
+.engine-smoke{
+  position:absolute;
+  width:22px;height:22px;border-radius:50%;
+  transform:translate(-50%,-50%) scale(.55);
+  background:radial-gradient(circle at 38% 35%,
+    rgba(255,255,255,.92) 0 15%,
+    rgba(231,238,255,.72) 32%,
+    rgba(170,190,232,.34) 56%,
+    rgba(118,145,205,.08) 72%,
+    transparent 74%);
+  filter:blur(.25px);
+  animation:engineSmokeFade 1.15s ease-out forwards;
+}
+@keyframes engineSmokeFade{
+  0%{opacity:.72;transform:translate(-50%,-50%) scale(.45)}
+  35%{opacity:.50}
+  100%{opacity:0;transform:translate(calc(-50% - 20px),calc(-50% + 24px)) scale(2.4)}
+}
+#stegoSplash .space-stars{animation-duration:14s !important}
+.splash-brand{transition:opacity .45s ease,transform .45s ease}
+@media(max-width:600px){
+  .flight-wrap{
+    width:270px !important;
+    height:390px !important;
+  }
+}
+</style>
+
+
+<style>
+/* ===== STEGO DYNAMIC EXHAUST V9 ===== */
+.engine-smoke{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  transform:translate(-50%,-50%) scale(var(--start-scale,.45));
+  background:
+    radial-gradient(circle at 35% 30%,
+      rgba(255,255,255,var(--core-alpha,.95)) 0 12%,
+      rgba(239,244,255,var(--mid-alpha,.72)) 28%,
+      rgba(190,204,235,var(--outer-alpha,.30)) 52%,
+      rgba(117,139,187,.08) 70%,
+      transparent 73%);
+  filter:blur(var(--blur,.3px));
+  opacity:var(--opacity,.72);
+  will-change:transform,opacity;
+  animation:engineSmokeV9 var(--life,1.25s) cubic-bezier(.18,.67,.25,1) forwards !important;
+}
+.engine-spark{
+  position:absolute;
+  width:4px;height:4px;border-radius:50%;
+  pointer-events:none;
+  background:radial-gradient(circle,#fff 0 20%,#ffd45b 32%,#ff7b22 62%,transparent 72%);
+  box-shadow:0 0 8px rgba(255,137,35,.85);
+  animation:engineSparkV9 var(--life,.55s) ease-out forwards;
+}
+@keyframes engineSmokeV9{
+  0%{opacity:var(--opacity,.72);transform:translate(-50%,-50%) translate3d(0,0,0) scale(var(--start-scale,.45))}
+  35%{opacity:.48}
+  72%{opacity:.18}
+  100%{
+    opacity:0;
+    transform:translate(-50%,-50%) translate3d(var(--drift-x,-22px),var(--drift-y,28px),0) scale(var(--end-scale,2.3))
+  }
+}
+@keyframes engineSparkV9{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) translate3d(var(--spark-x,-32px),var(--spark-y,34px),0) scale(.35)}
+}
+</style>
+
+
+<style>
+/* ===== STEGO RESPONSIVE LAYOUT V12 ===== */
+
+/* Shared improvements */
+html,body{width:100%;max-width:100%;overflow-x:hidden}
+img,svg,video{max-width:100%;height:auto}
+button,input,select,textarea{max-width:100%}
+.shell{width:100%;max-width:1380px;margin:0 auto}
+.stage{min-width:0}
+.phone,.workspace{min-width:0}
+.mobile-scroll{-webkit-overflow-scrolling:touch}
+.table-wrap{max-width:100%;overflow:auto}
+table{width:100%}
+
+/* Desktop */
+@media (min-width:1180px){
+  .shell{padding:24px 28px}
+  .stage{grid-template-columns:440px minmax(0,1fr);gap:28px}
+  .phone{width:440px;min-height:840px}
+  .workspace{min-height:760px}
+  .admin-content{min-height:690px}
+  .kpi-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .two-col{grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr)}
+}
+
+/* Small desktop / large tablet landscape */
+@media (min-width:901px) and (max-width:1179px){
+  .shell{padding:18px}
+  .stage{grid-template-columns:390px minmax(0,1fr);gap:18px}
+  .phone{width:390px;min-height:780px}
+  .workspace{border-radius:24px}
+  .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two-col{grid-template-columns:1fr}
+  .backup-grid{grid-template-columns:1fr 1fr}
+  .editor{grid-template-columns:1fr 1fr}
+  .editor .btn{grid-column:span 2}
+}
+
+/* Tablet portrait and landscape */
+@media (min-width:601px) and (max-width:900px){
+  body{background:#eef3f9}
+  .shell{padding:14px}
+  .prototype-bar{position:sticky;top:0;z-index:50;padding:8px 0;background:rgba(238,243,249,.92);backdrop-filter:blur(14px)}
+  .stage{display:block}
+  .phone{
+    width:min(620px,100%);
+    margin:0 auto 18px;
+    min-height:860px;
+    border:0;
+    border-radius:26px;
+    box-shadow:0 22px 55px rgba(24,45,95,.14)
+  }
+  .phone:before{display:none}
+  .mobile-head{padding-top:16px}
+  .mobile-scroll{max-height:none;min-height:720px}
+  .workspace{
+    display:block !important;
+    width:100%;
+    border-radius:26px;
+    margin-top:18px
+  }
+  .admin-content{min-height:600px}
+  .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .two-col{grid-template-columns:1fr}
+  .backup-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .editor{grid-template-columns:1fr 1fr}
+  .editor .btn{grid-column:span 2}
+  .admin-tabs{scroll-snap-type:x proximity}
+  .admin-tabs button{scroll-snap-align:start}
+}
+
+/* Phones */
+@media (max-width:600px){
+  body{background:#fff}
+  .shell{padding:0}
+  .prototype-bar{
+    padding:8px 10px;
+    margin:0;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    position:sticky;
+    top:0;
+    z-index:60
+  }
+  .brand-mini img{width:44px;height:34px}
+  .brand-mini b{font-size:13px}
+  .mode-toggle button{padding:7px 10px;font-size:10px}
+  #installPwaBtn{padding:7px 10px !important;font-size:10px !important}
+
+  .stage{display:block}
+  .phone{
+    width:100%;
+    min-height:calc(100vh - 56px);
+    border:0;
+    border-radius:0;
+    box-shadow:none;
+    margin:0
+  }
+  .phone:before{display:none}
+  .mobile-head{
+    padding:10px 14px 8px;
+    position:sticky;
+    top:53px;
+    background:#fff;
+    z-index:25;
+    border-bottom:1px solid rgba(232,237,245,.7)
+  }
+  .mobile-logo{width:150px;height:48px}
+  .mobile-scroll{
+    padding:0 12px 94px;
+    max-height:none;
+    min-height:calc(100vh - 150px)
+  }
+  .hero{padding:16px;border-radius:20px}
+  .hero h2{font-size:23px}
+  .quick-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .quick{min-height:102px;padding:12px;border-radius:16px}
+  .promo-card{min-height:132px}
+  .promo-card img{height:132px}
+  .food-row{gap:8px}
+  .food{min-width:148px}
+  .bottom-nav{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    width:100%;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom))
+  }
+
+  /* Admin becomes a true mobile admin panel */
+  .workspace{
+    display:none;
+    width:100%;
+    border-radius:0;
+    box-shadow:none;
+    min-height:100vh
+  }
+  body.admin-mobile .phone{display:none}
+  body.admin-mobile .workspace{display:block !important}
+  body.admin-mobile .prototype-bar{position:sticky;top:0}
+  .workspace-head{padding:16px}
+  .workspace-head h2,.admin-brand-copy h2{font-size:16px}
+  .owner-badge{font-size:9px;padding:6px 8px}
+  .admin-tabs{padding:10px 12px;gap:6px}
+  .admin-tabs button{font-size:10px;padding:8px 10px}
+  .admin-content{padding:12px;min-height:calc(100vh - 160px)}
+  .kpi-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .kpi{padding:12px}
+  .kpi strong{font-size:19px}
+  .two-col{grid-template-columns:1fr;gap:10px}
+  .backup-grid{grid-template-columns:1fr}
+  .editor{grid-template-columns:1fr}
+  .editor .btn{grid-column:auto}
+  .toolbar{align-items:flex-start;gap:8px;flex-wrap:wrap}
+  .toolbar h3{width:100%}
+  .table-wrap{border-radius:12px}
+  table{min-width:620px}
+}
+
+/* Very small phones */
+@media (max-width:380px){
+  .quick-grid{grid-template-columns:1fr}
+  .quick{min-height:auto}
+  .member-pill{align-items:flex-start;gap:10px}
+  .qr{width:42px;height:42px}
+  .splash-title{font-size:26px}
+  .splash-sub{font-size:10px}
+  .kpi-grid{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 <body>
 
+
 <div id="stegoSplash" aria-label="Stego loading screen">
   <div class="space-stars"></div>
-  <div class="flight-wrap">
-    <div class="speed-line"></div>
-    
-    <img class="flight-logo" src="stego-rocket-astronaut.png" alt="Stego astronaut flying">
+  <div class="splash-glow glow-one"></div>
+  <div class="splash-glow glow-two"></div>
+  <div id="smokeLayer" class="smoke-layer" aria-hidden="true"></div>
+<div class="flight-wrap">
+    <img class="flight-logo" src="stego-cinematic-rocket.png?v=11" alt="Stego astronaut rocket">
+  </div>
+  <div class="splash-brand">
+    <div class="splash-title">STEGOLAND</div>
+    <div class="splash-sub">Play • Eat • Chill • Explore</div>
   </div>
   <div class="splash-copy">
-    <span>Stego Journey</span>
-    <b>On the way to Stegoland 🚀</b>
-    <div class="loading-orbit"></div>
+    <b id="splashStatus">Starting your journey...</b>
+    <div class="splash-progress"><span id="splashProgress"></span></div>
   </div>
 </div>
 
@@ -615,12 +983,18 @@ function adminView(id,btn){
 document.getElementById('customerMode').onclick=()=>{
   document.getElementById('customerMode').classList.add('active');
   document.getElementById('adminMode').classList.remove('active');
-  document.querySelector('.phone').scrollIntoView({behavior:'smooth'})
+  document.body.classList.remove('admin-mobile');
+  requestAnimationFrame(()=>document.querySelector('.phone')?.scrollIntoView({behavior:'smooth',block:'start'}));
 };
 document.getElementById('adminMode').onclick=()=>{
   document.getElementById('adminMode').classList.add('active');
   document.getElementById('customerMode').classList.remove('active');
-  document.querySelector('.workspace').scrollIntoView({behavior:'smooth'})
+  if(window.matchMedia('(max-width:600px)').matches){
+    document.body.classList.add('admin-mobile');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }else{
+    document.querySelector('.workspace')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }
 };
 
 function getTicketPrice(){
@@ -915,17 +1289,196 @@ refreshDashboard();
 <script>
 window.addEventListener('load', () => {
   const splash = document.getElementById('stegoSplash');
-  const minSplash = 4250;
-  setTimeout(() => {
-    if (splash) {
-      splash.classList.add('hide');
-      setTimeout(() => splash.remove(), 650);
-    }
-  }, minSplash);
+  const rocket = splash?.querySelector('.flight-wrap');
+  const smokeLayer = document.getElementById('smokeLayer');
+  const bar = document.getElementById('splashProgress');
+  const status = document.getElementById('splashStatus');
+  const brand = splash?.querySelector('.splash-brand');
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(err => console.warn('SW registration failed', err));
   }
+
+  if (!splash || !rocket) return;
+
+  // Cubic Bezier path: starts outside bottom-left, sweeps inward,
+  // then naturally climbs and exits beyond the upper-right.
+  const duration = 4300;
+  let startTime = null;
+  let lastSmoke = 0;
+  let lastStatus = '';
+  let prevX = null;
+  let prevY = null;
+  let prevNow = null;
+
+  const easeInOut = t =>
+    t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2,3)/2;
+
+  function bezier(t,p0,p1,p2,p3){
+    const u=1-t;
+    return u*u*u*p0 + 3*u*u*t*p1 + 3*u*t*t*p2 + t*t*t*p3;
+  }
+  function bezierDerivative(t,p0,p1,p2,p3){
+    const u=1-t;
+    return 3*u*u*(p1-p0) + 6*u*t*(p2-p1) + 3*t*t*(p3-p2);
+  }
+
+  function emitExhaust(x,y,angle,scale,speed,t){
+    if(!smokeLayer) return;
+
+    // Engine intensity changes through launch, cruise, and exit.
+    let throttle;
+    if(t < .18) throttle=.98;
+    else if(t < .68) throttle=.74;
+    else throttle=Math.max(.20,.74-(t-.68)*1.55);
+
+    const rad=angle*Math.PI/180;
+    const exhaustDistance=100*scale;
+    const baseX=x-Math.cos(rad)*exhaustDistance;
+    const baseY=y-Math.sin(rad)*exhaustDistance+44*scale;
+
+    // Particle count varies with throttle and actual on-screen speed.
+    const speedBoost=Math.min(.75,speed/1800);
+    const density=Math.max(1,Math.round(1+throttle*2.1+speedBoost));
+
+    for(let i=0;i<density;i++){
+      const s=document.createElement('span');
+      s.className='engine-smoke';
+
+      const jitterX=(Math.random()-.5)*22*scale;
+      const jitterY=(Math.random()-.5)*17*scale;
+      s.style.left=(baseX+jitterX)+'px';
+      s.style.top=(baseY+jitterY)+'px';
+
+      const size=(12+Math.random()*24)*(0.70+throttle*.48)*scale;
+      s.style.width=size+'px';
+      s.style.height=size+'px';
+
+      s.style.setProperty('--opacity',(0.34+Math.random()*.38*throttle).toFixed(2));
+      s.style.setProperty('--start-scale',(0.25+Math.random()*.24).toFixed(2));
+      s.style.setProperty('--end-scale',(1.55+Math.random()*1.80).toFixed(2));
+      s.style.setProperty('--blur',(0.10+Math.random()*.85).toFixed(2)+'px');
+      s.style.setProperty('--life',(0.78+Math.random()*.92)+'s');
+      s.style.setProperty('--core-alpha',(0.80+Math.random()*.18).toFixed(2));
+      s.style.setProperty('--mid-alpha',(0.44+Math.random()*.28).toFixed(2));
+      s.style.setProperty('--outer-alpha',(0.15+Math.random()*.20).toFixed(2));
+
+      // Drift follows the opposite direction of travel, with random turbulence.
+      const driftBase=18+Math.min(speed/30,34);
+      const driftAngle=rad+Math.PI+(Math.random()-.5)*.58;
+      const driftDist=driftBase*(.72+Math.random()*.82);
+      s.style.setProperty('--drift-x',(Math.cos(driftAngle)*driftDist)+'px');
+      s.style.setProperty('--drift-y',(Math.sin(driftAngle)*driftDist+12+Math.random()*22)+'px');
+
+      smokeLayer.appendChild(s);
+      setTimeout(()=>s.remove(),1900);
+    }
+
+    // A few sparks at high throttle, never constant.
+    if(Math.random() < .24*throttle){
+      const sparkCount=Math.random()<.28?2:1;
+      for(let i=0;i<sparkCount;i++){
+        const p=document.createElement('span');
+        p.className='engine-spark';
+        p.style.left=(baseX+(Math.random()-.5)*12)+'px';
+        p.style.top=(baseY+(Math.random()-.5)*10)+'px';
+        const dist=25+Math.random()*42;
+        const a=rad+Math.PI+(Math.random()-.5)*.42;
+        p.style.setProperty('--spark-x',(Math.cos(a)*dist)+'px');
+        p.style.setProperty('--spark-y',(Math.sin(a)*dist+8+Math.random()*15)+'px');
+        p.style.setProperty('--life',(0.32+Math.random()*.36)+'s');
+        smokeLayer.appendChild(p);
+        setTimeout(()=>p.remove(),850);
+      }
+    }
+  }
+
+  function updateStatus(t){
+    let text, progress;
+    if(t < .18){ text='Starting your journey...'; progress=14 + t*80; }
+    else if(t < .42){ text='Igniting engines...'; progress=28 + (t-.18)*105; }
+    else if(t < .72){ text='Heading to Stegoland...'; progress=53 + (t-.42)*90; }
+    else if(t < .91){ text='Almost there...'; progress=80 + (t-.72)*90; }
+    else { text='Welcome!'; progress=100; }
+
+    if(status && text!==lastStatus){ status.textContent=text; lastStatus=text; }
+    if(bar) bar.style.width=Math.min(100,progress)+'%';
+  }
+
+  function frame(now){
+    if(startTime===null) startTime=now;
+    const raw=Math.min(1,(now-startTime)/duration);
+    const t=easeInOut(raw);
+
+    const w=window.innerWidth;
+    const h=window.innerHeight;
+
+    // The path deliberately avoids a straight diagonal.
+    const x=bezier(t,-w*.22,w*.08,w*.58,w*1.10);
+    const y=bezier(t,h*1.04,h*.72,h*.43,-h*.30);
+
+    const dx=bezierDerivative(t,-w*.22,w*.08,w*.58,w*1.10);
+    const dy=bezierDerivative(t,h*1.04,h*.72,h*.43,-h*.30);
+
+    // Artwork already points upward/right. Only subtle steering rotation.
+    const pathAngle=Math.atan2(dy,dx)*180/Math.PI;
+    const angle=Math.max(-18,Math.min(4,pathAngle+37));
+
+    // Gentle acceleration illusion without dramatic PowerPoint-style scaling.
+    const scale = raw < .18
+      ? .80 + raw*.65
+      : raw < .72
+        ? .92 + Math.sin((raw-.18)/.54*Math.PI)*.055
+        : .92 - (raw-.72)*.46;
+
+    const opacity = raw < .06 ? raw/.06 : raw > .93 ? (1-raw)/.07 : 1;
+
+    rocket.style.transform =
+      `translate3d(${x}px,${y}px,0) translate(-50%,-50%) rotate(${angle}deg) scale(${scale})`;
+    rocket.style.opacity=Math.max(0,opacity);
+
+    // Calculate current screen speed so exhaust reacts to acceleration.
+    let speed=0;
+    if(prevX!==null && prevNow!==null){
+      const dt=Math.max(1,now-prevNow)/1000;
+      speed=Math.hypot(x-prevX,y-prevY)/dt;
+    }
+    prevX=x; prevY=y; prevNow=now;
+
+    // Exhaust frequency changes through the flight.
+    let smokeInterval;
+    if(raw<.16) smokeInterval=38;                          // dense launch plume
+    else if(raw<.58) smokeInterval=54+Math.sin(raw*20)*9; // breathing cruise trail
+    else if(raw<.80) smokeInterval=68+(raw-.58)*130;      // gradually taper
+    else smokeInterval=118;                               // light exhaust before exit
+
+    if(raw>.035 && raw<.90 && now-lastSmoke>smokeInterval){
+      emitExhaust(x,y,angle,scale,speed,raw);
+      lastSmoke=now;
+    }
+
+    updateStatus(raw);
+
+    // Fade branding slightly as the rocket crosses the center.
+    if(brand){
+      const centerFade = raw>.35 && raw<.70 ? .58 : 1;
+      brand.style.opacity=centerFade;
+      brand.style.transform=`translateY(${raw>.35&&raw<.70?-5:0}px)`;
+    }
+
+    if(raw<1){
+      requestAnimationFrame(frame);
+    }else{
+      if(bar) bar.style.width='100%';
+      if(status) status.textContent='Welcome!';
+      setTimeout(()=>{
+        splash.classList.add('hide');
+        setTimeout(()=>splash.remove(),620);
+      },180);
+    }
+  }
+
+  requestAnimationFrame(frame);
 });
 
 let deferredInstallPrompt;
@@ -952,5 +1505,12 @@ document.addEventListener('click', async (e) => {
 });
 </script>
 
+<script>
+window.addEventListener('resize',()=>{
+  if(!window.matchMedia('(max-width:600px)').matches){
+    document.body.classList.remove('admin-mobile');
+  }
+});
+</script>
 </body>
 </html>

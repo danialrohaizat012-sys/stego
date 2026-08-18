@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stego-pwa-v6-rocketfix';
+const CACHE_NAME = 'stego-pwa-v14-appname-only';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,7 +8,8 @@ const APP_SHELL = [
   './icon-maskable-512.png',
   './stegoland-logo-transparent.png',
   './stego-astronaut-transparent.png',
-  './stego-rocket-astronaut.png'
+  './stego-rocket-astronaut.png',
+  './stego-cinematic-rocket.png'
 ];
 
 self.addEventListener('install', event => {

@@ -333,3 +333,12 @@ class _FloatingMascotState extends State<FloatingMascot> with SingleTickerProvid
     );
   }
 }
+
+/// Human-readable message for errors thrown by the store / Firebase.
+String errorMessage(Object e) {
+  if (e is StateError) return e.message;
+  final s = e.toString();
+  if (s.contains('permission-denied')) return 'Tiada kebenaran. Sila cuba lagi atau hubungi Stegoland.';
+  if (s.contains('unavailable') || s.contains('network')) return 'Tiada sambungan internet. Cuba lagi.';
+  return 'Ralat: $s';
+}

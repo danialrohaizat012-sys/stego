@@ -95,8 +95,8 @@ class _GroupBookingScreenState extends State<GroupBookingScreen> {
       if (!mounted) return;
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (_) => TicketScreen(bookingId: b.id, justCreated: true)));
-    } on StateError catch (e) {
-      if (mounted) showSnack(context, e.message);
+    } catch (e) {
+      if (mounted) showSnack(context, errorMessage(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

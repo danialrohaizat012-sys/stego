@@ -22,7 +22,7 @@ class TimeSlot {
 
   Map<String, dynamic> toJson() => {'id': id, 'start': start, 'end': end};
   factory TimeSlot.fromJson(Map<String, dynamic> j) =>
-      TimeSlot(id: j['id'] as String, start: j['start'] as int, end: j['end'] as int);
+      TimeSlot(id: j['id'] as String, start: (j['start'] as num).toInt(), end: (j['end'] as num).toInt());
 }
 
 class BusinessInfo {
@@ -222,21 +222,21 @@ class Settings {
     holidayPrice: (j['holidayPrice'] as num).toDouble(),
     guardianPrice: (j['guardianPrice'] as num).toDouble(),
     groupChildPrice: (j['groupChildPrice'] as num).toDouble(),
-    freeTeachers: j['freeTeachers'] as int,
+    freeTeachers: (j['freeTeachers'] as num).toInt(),
     extraTeacherPrice: (j['extraTeacherPrice'] as num).toDouble(),
     kidsMealPrice: (j['kidsMealPrice'] as num).toDouble(),
     drinkPrice: (j['drinkPrice'] as num).toDouble(),
     privateSessionPrice: (j['privateSessionPrice'] as num).toDouble(),
-    groupMinimum: j['groupMinimum'] as int,
-    slotCapacity: j['slotCapacity'] as int,
+    groupMinimum: (j['groupMinimum'] as num).toInt(),
+    slotCapacity: (j['slotCapacity'] as num).toInt(),
     slots: (j['slots'] as List).map((e) => TimeSlot.fromJson(Map<String, dynamic>.from(e as Map))).toList(),
-    weekendDays: (j['weekendDays'] as List).cast<int>(),
+    weekendDays: (j['weekendDays'] as List).map((e) => (e as num).toInt()).toList(),
     holidays: (j['holidays'] as List).cast<String>(),
     fridayPrayerBreak: j['fridayPrayerBreak'] as bool,
     adminPin: j['adminPin'] as String,
     lastCallEnabled: j['lastCallEnabled'] as bool? ?? true,
-    lastCallStart: j['lastCallStart'] as int? ?? 20 * 60,
-    lastCallEnd: j['lastCallEnd'] as int? ?? 22 * 60,
+    lastCallStart: (j['lastCallStart'] as num?)?.toInt() ?? 20 * 60,
+    lastCallEnd: (j['lastCallEnd'] as num?)?.toInt() ?? 22 * 60,
   );
 }
 
@@ -291,9 +291,9 @@ class GroupDetails {
   factory GroupDetails.fromJson(Map<String, dynamic> j) => GroupDetails(
     institution: j['institution'] as String,
     institutionType: j['institutionType'] as String,
-    teachers: j['teachers'] as int,
-    meals: j['meals'] as int,
-    drinks: j['drinks'] as int,
+    teachers: (j['teachers'] as num).toInt(),
+    meals: (j['meals'] as num).toInt(),
+    drinks: (j['drinks'] as num).toInt(),
     privateSession: j['privateSession'] as bool,
     notes: j['notes'] as String? ?? '',
   );
@@ -314,7 +314,11 @@ class Booking {
     required this.contactPhone,
     required this.createdAt,
     this.group,
+    this.ownerUid,
   });
+
+  /// Firebase Auth uid of the customer who made it (null in local mode).
+  final String? ownerUid;
 
   final String id;
   final BookingKind kind;
@@ -346,6 +350,7 @@ class Booking {
     contactPhone: contactPhone,
     createdAt: createdAt,
     group: group,
+    ownerUid: ownerUid,
   );
 
   Map<String, dynamic> toJson() => {
@@ -362,6 +367,7 @@ class Booking {
     'contactPhone': contactPhone,
     'createdAt': createdAt.toIso8601String(),
     if (group != null) 'group': group!.toJson(),
+    if (ownerUid != null) 'ownerUid': ownerUid,
   };
 
   factory Booking.fromJson(Map<String, dynamic> j) => Booking(
@@ -369,8 +375,8 @@ class Booking {
     kind: BookingKind.values.byName(j['kind'] as String),
     date: j['date'] as String,
     slotId: j['slotId'] as String,
-    children: j['children'] as int,
-    guardians: j['guardians'] as int,
+    children: (j['children'] as num).toInt(),
+    guardians: (j['guardians'] as num).toInt(),
     total: (j['total'] as num).toDouble(),
     status: BookingStatus.values.byName(j['status'] as String),
     paid: j['paid'] as bool,
@@ -378,6 +384,7 @@ class Booking {
     contactPhone: j['contactPhone'] as String,
     createdAt: DateTime.parse(j['createdAt'] as String),
     group: j['group'] == null ? null : GroupDetails.fromJson(Map<String, dynamic>.from(j['group'] as Map)),
+    ownerUid: j['ownerUid'] as String?,
   );
 }
 
@@ -443,7 +450,7 @@ class OrderLine {
     itemId: j['itemId'] as String,
     name: j['name'] as String,
     price: (j['price'] as num).toDouble(),
-    qty: j['qty'] as int,
+    qty: (j['qty'] as num).toInt(),
   );
 }
 
@@ -478,9 +485,11 @@ class CafeOrder {
     required this.note,
     required this.status,
     required this.createdAt,
+    this.ownerUid,
   });
 
   final String id;
+  final String? ownerUid;
   final List<OrderLine> lines;
   final OrderMode mode;
   final String table;
@@ -501,10 +510,13 @@ class CafeOrder {
     note: note,
     status: status ?? this.status,
     createdAt: createdAt,
+    ownerUid: ownerUid,
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
+    if (ownerUid != null) 'ownerUid': ownerUid,
+    'total': total,
     'lines': lines.map((l) => l.toJson()).toList(),
     'mode': mode.name,
     'table': table,
@@ -523,6 +535,7 @@ class CafeOrder {
     note: j['note'] as String? ?? '',
     status: OrderStatus.values.byName(j['status'] as String),
     createdAt: DateTime.parse(j['createdAt'] as String),
+    ownerUid: j['ownerUid'] as String?,
   );
 }
 
@@ -555,7 +568,7 @@ class Member {
     id: j['id'] as String,
     name: j['name'] as String,
     phone: j['phone'] as String,
-    points: j['points'] as int,
+    points: (j['points'] as num).toInt(),
     joined: DateTime.parse(j['joined'] as String),
   );
 }
@@ -624,6 +637,6 @@ class LastCallDeal {
     itemId: j['itemId'] as String,
     date: j['date'] as String,
     price: (j['price'] as num).toDouble(),
-    qtyLeft: j['qtyLeft'] as int,
+    qtyLeft: (j['qtyLeft'] as num).toInt(),
   );
 }

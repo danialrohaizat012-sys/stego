@@ -31,11 +31,69 @@ class GroupQuote {
   double get total => childTotal + teacherTotal + mealTotal + drinkTotal + privateTotal;
 }
 
+/// Public, PII-free record of seats taken in a slot (cloud mode). Lets every
+/// customer see live capacity without being able to read other bookings.
+class SlotEntry {
+  const SlotEntry({
+    required this.date,
+    required this.slotId,
+    required this.children,
+    required this.private,
+    required this.active,
+  });
+  final String date;
+  final String slotId;
+  final int children;
+  final bool private;
+  final bool active;
+
+  factory SlotEntry.fromJson(Map<String, dynamic> j) => SlotEntry(
+    date: j['date'] as String,
+    slotId: j['slotId'] as String,
+    children: (j['children'] as num).toInt(),
+    private: j['private'] as bool? ?? false,
+    active: j['active'] as bool? ?? true,
+  );
+
+  static Map<String, dynamic> fromBooking(Booking b) => {
+    'date': b.date,
+    'slotId': b.slotId,
+    'children': b.children,
+    'private': b.group?.privateSession ?? false,
+    'active': b.status.isActive,
+  };
+}
+
+/// Cloud backend (Firebase). When attached to [AppStore.remote], writes go to
+/// the cloud and listeners push changes back into the store.
+abstract class Remote {
+  String? get uid;
+  Future<void> saveMember(Member m);
+  Future<String> redeem(Reward reward, String code);
+  Future<void> createBooking(Booking b);
+  Future<void> setBookingStatus(Booking b, BookingStatus status);
+  Future<void> setBookingPaid(Booking b, bool paid);
+  Future<void> placeOrder(CafeOrder o, Map<String, int> dealQty);
+  Future<void> setOrderStatus(CafeOrder o, OrderStatus status);
+  Future<void> upsertMenuItem(MenuItem m);
+  Future<void> deleteMenuItem(String id);
+  Future<void> upsertDeal(LastCallDeal d);
+  Future<void> removeDeal(String id);
+  Future<void> updateSettings(Settings s);
+  Future<void> updateBusiness(BusinessInfo b);
+
+  /// Returns an error message, or null on success.
+  Future<String?> staffSignIn(String email, String password);
+  Future<void> staffSignOut();
+}
+
 /// Single source of truth for the app.
 ///
-/// Data is persisted on-device with SharedPreferences. All reads/writes go
-/// through this class, so swapping persistence for a cloud backend
-/// (Firebase / Supabase) later only touches [_load] and [_save].
+/// Two modes:
+/// * **Local** (no Firebase configured): everything is persisted on-device
+///   with SharedPreferences.
+/// * **Cloud** ([remote] attached): bookings, orders, menu, settings and
+///   members live in Firestore; the cart and onboarding flag stay local.
 class AppStore extends ChangeNotifier {
   AppStore({DateTime Function()? clock}) : _clock = clock ?? DateTime.now;
 
@@ -56,6 +114,27 @@ class AppStore extends ChangeNotifier {
   Member? member;
   bool onboarded = false;
   bool ready = false;
+
+  // Cloud mode state
+  Remote? remote;
+  bool get isCloud => remote != null;
+  bool isStaff = false;
+  String? staffEmail;
+  List<Booking> staffBookings = [];
+  List<CafeOrder> staffOrders = [];
+  List<SlotEntry> slotEntries = [];
+
+  /// Bookings/orders visible in the staff panel.
+  List<Booking> get adminBookings => isCloud ? staffBookings : bookings;
+  List<CafeOrder> get adminOrders => isCloud ? staffOrders : orders;
+
+  /// Applies a change pushed from the cloud.
+  void applyRemote(void Function() change) {
+    change();
+    notifyListeners();
+  }
+
+  Future<void> persistLocal() => _save();
 
   // ---------------------------------------------------------------- storage
 
@@ -124,6 +203,7 @@ class AppStore extends ChangeNotifier {
   Future<void> completeOnboarding({String? name, String? phone}) async {
     if (name != null && name.trim().isNotEmpty && phone != null && phone.trim().isNotEmpty) {
       member = Member(id: _id('STG'), name: name.trim(), phone: phone.trim(), points: 0, joined: now);
+      await _syncMember();
     }
     onboarded = true;
     await _save();
@@ -133,7 +213,17 @@ class AppStore extends ChangeNotifier {
     member = member == null
         ? Member(id: _id('STG'), name: name, phone: phone, points: 0, joined: now)
         : member!.copyWith(name: name, phone: phone);
+    await _syncMember();
     await _save();
+  }
+
+  Future<void> _syncMember() async {
+    if (remote == null || member == null) return;
+    try {
+      await remote!.saveMember(member!);
+    } catch (e) {
+      debugPrint('Stegoland: member sync failed ($e)');
+    }
   }
 
   bool _isMine(String phone) => member != null && _digits(member!.phone) == _digits(phone) && _digits(phone).isNotEmpty;
@@ -148,6 +238,7 @@ class AppStore extends ChangeNotifier {
   Future<String?> redeem(Reward reward) async {
     final m = member;
     if (m == null || m.points < reward.cost) return null;
+    if (remote != null) return remote!.redeem(reward, _id('RWD'));
     member = m.copyWith(points: m.points - reward.cost);
     final v = Voucher(code: _id('RWD'), title: reward.title, createdAt: now, used: false);
     vouchers = [v, ...vouchers];
@@ -226,11 +317,16 @@ class AppStore extends ChangeNotifier {
   Iterable<Booking> _activeIn(String date, String slotId) =>
       bookings.where((b) => b.date == date && b.slotId == slotId && b.status.isActive);
 
-  int bookedChildren(DateTime date, String slotId) =>
-      _activeIn(dateKey(date), slotId).fold(0, (a, b) => a + b.children);
+  Iterable<SlotEntry> _entriesIn(String date, String slotId) =>
+      slotEntries.where((e) => e.date == date && e.slotId == slotId && e.active);
 
-  bool isPrivate(DateTime date, String slotId) =>
-      _activeIn(dateKey(date), slotId).any((b) => b.group?.privateSession ?? false);
+  int bookedChildren(DateTime date, String slotId) => isCloud
+      ? _entriesIn(dateKey(date), slotId).fold(0, (a, e) => a + e.children)
+      : _activeIn(dateKey(date), slotId).fold(0, (a, b) => a + b.children);
+
+  bool isPrivate(DateTime date, String slotId) => isCloud
+      ? _entriesIn(dateKey(date), slotId).any((e) => e.private)
+      : _activeIn(dateKey(date), slotId).any((b) => b.group?.privateSession ?? false);
 
   int remaining(DateTime date, String slotId) {
     if (isPrivate(date, slotId)) return 0;
@@ -283,8 +379,14 @@ class AppStore extends ChangeNotifier {
       contactName: name.trim(),
       contactPhone: phone.trim(),
       createdAt: now,
+      ownerUid: remote?.uid,
     );
-    bookings = [b, ...bookings];
+    return _addBooking(b);
+  }
+
+  Future<Booking> _addBooking(Booking b) async {
+    if (remote != null) await remote!.createBooking(b);
+    bookings = [b, ...bookings.where((x) => x.id != b.id)];
     await _save();
     return b;
   }
@@ -323,20 +425,33 @@ class AppStore extends ChangeNotifier {
       contactPhone: phone.trim(),
       createdAt: now,
       group: group,
+      ownerUid: remote?.uid,
     );
-    bookings = [b, ...bookings];
-    await _save();
-    return b;
+    return _addBooking(b);
   }
 
   Booking? bookingById(String id) {
-    for (final b in bookings) {
+    for (final b in [...bookings, ...staffBookings]) {
       if (b.id == id) return b;
     }
     return null;
   }
 
+  List<Booking> _replaceBooking(List<Booking> list, Booking nb) => [
+    for (final b in list)
+      if (b.id == nb.id) nb else b,
+  ];
+
   Future<void> setBookingStatus(String id, BookingStatus status) async {
+    if (remote != null) {
+      final b = bookingById(id);
+      if (b == null) return;
+      await remote!.setBookingStatus(b, status);
+      final nb = b.copyWith(status: status);
+      bookings = _replaceBooking(bookings, nb);
+      staffBookings = _replaceBooking(staffBookings, nb);
+      return _save();
+    }
     bookings = [
       for (final b in bookings)
         if (b.id == id) b.copyWith(status: status) else b,
@@ -349,6 +464,15 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> setBookingPaid(String id, bool paid) async {
+    if (remote != null) {
+      final b = bookingById(id);
+      if (b == null) return;
+      await remote!.setBookingPaid(b, paid);
+      final nb = b.copyWith(paid: paid);
+      bookings = _replaceBooking(bookings, nb);
+      staffBookings = _replaceBooking(staffBookings, nb);
+      return _save();
+    }
     bookings = [
       for (final b in bookings)
         if (b.id == id) b.copyWith(paid: paid) else b,
@@ -464,6 +588,7 @@ class AppStore extends ChangeNotifier {
     final deal =
         existing?.copyWith(price: price, qtyLeft: qty) ??
         LastCallDeal(id: _id('LC'), itemId: itemId, date: today, price: price, qtyLeft: qty);
+    if (remote != null) await remote!.upsertDeal(deal);
     // Drop deals from previous days while we're here.
     deals = [
       for (final d in deals)
@@ -475,6 +600,7 @@ class AppStore extends ChangeNotifier {
 
   Future<void> removeDeal(String id) async {
     final d = deals.where((d) => d.id == id).firstOrNull;
+    if (remote != null) await remote!.removeDeal(id);
     deals = deals.where((d) => d.id != id).toList();
     if (d != null) cart = cart.where((l) => l.itemId != d.cartId).toList();
     await _save();
@@ -502,10 +628,9 @@ class AppStore extends ChangeNotifier {
         throw StateError('Hanya tinggal ${d.qtyLeft} untuk "${l.name}".');
       }
     }
-    deals = [
-      for (final d in deals)
-        d.copyWith(qtyLeft: d.qtyLeft - cart.where((l) => l.itemId == d.cartId).fold(0, (a, l) => a + l.qty)),
-    ];
+    final dealQty = <String, int>{
+      for (final l in cart.where((l) => l.itemId.startsWith('lc:'))) _dealByCartId(l.itemId)!.id: l.qty,
+    };
     final o = CafeOrder(
       id: _id('ORD'),
       lines: List.of(cart),
@@ -515,7 +640,10 @@ class AppStore extends ChangeNotifier {
       note: note.trim(),
       status: OrderStatus.received,
       createdAt: now,
+      ownerUid: remote?.uid,
     );
+    if (remote != null) await remote!.placeOrder(o, dealQty);
+    deals = [for (final d in deals) d.copyWith(qtyLeft: d.qtyLeft - (dealQty[d.id] ?? 0))];
     orders = [o, ...orders];
     cart = [];
     await _save();
@@ -523,6 +651,18 @@ class AppStore extends ChangeNotifier {
   }
 
   Future<void> setOrderStatus(String id, OrderStatus status) async {
+    if (remote != null) {
+      final o = [...staffOrders, ...orders].where((o) => o.id == id).firstOrNull;
+      if (o == null) return;
+      await remote!.setOrderStatus(o, status);
+      List<CafeOrder> repl(List<CafeOrder> l) => [
+        for (final x in l)
+          if (x.id == id) x.copyWith(status: status) else x,
+      ];
+      staffOrders = repl(staffOrders);
+      orders = repl(orders);
+      return _save();
+    }
     CafeOrder? changed;
     orders = [
       for (final o in orders)
@@ -538,7 +678,24 @@ class AppStore extends ChangeNotifier {
 
   bool checkPin(String pin) => pin == settings.adminPin;
 
+  /// Cloud mode: signs a staff member in (separate session from the customer).
+  Future<String?> staffSignIn(String email, String password) async {
+    final err = await remote!.staffSignIn(email.trim(), password);
+    return err;
+  }
+
+  Future<void> staffSignOut() async {
+    await remote?.staffSignOut();
+    applyRemote(() {
+      isStaff = false;
+      staffEmail = null;
+      staffBookings = [];
+      staffOrders = [];
+    });
+  }
+
   Future<void> upsertMenuItem(MenuItem item) async {
+    if (remote != null) await remote!.upsertMenuItem(item);
     final exists = menu.any((m) => m.id == item.id);
     menu = exists
         ? [
@@ -553,17 +710,20 @@ class AppStore extends ChangeNotifier {
       MenuItem(id: _id('M'), name: '', category: menuCategories.first, price: 0, description: '', available: true);
 
   Future<void> deleteMenuItem(String id) async {
+    if (remote != null) await remote!.deleteMenuItem(id);
     menu = menu.where((m) => m.id != id).toList();
     cart = cart.where((l) => l.itemId != id).toList();
     await _save();
   }
 
   Future<void> updateSettings(Settings s) async {
+    if (remote != null) await remote!.updateSettings(s);
     settings = s;
     await _save();
   }
 
   Future<void> updateBusiness(BusinessInfo b) async {
+    if (remote != null) await remote!.updateBusiness(b);
     business = b;
     await _save();
   }
@@ -584,20 +744,20 @@ class AppStore extends ChangeNotifier {
 
   // Dashboard helpers
   List<Booking> bookingsOn(DateTime date) =>
-      bookings.where((b) => b.date == dateKey(date) && b.status.isActive).toList();
+      adminBookings.where((b) => b.date == dateKey(date) && b.status.isActive).toList();
 
   double revenueOn(DateTime date) {
     final k = dateKey(date);
-    final tix = bookings.where((b) => b.date == k && b.status.isActive).fold<double>(0, (a, b) => a + b.total);
-    final food = orders
+    final tix = adminBookings.where((b) => b.date == k && b.status.isActive).fold<double>(0, (a, b) => a + b.total);
+    final food = adminOrders
         .where((o) => dateKey(o.createdAt) == k && o.status != OrderStatus.cancelled)
         .fold<double>(0, (a, o) => a + o.total);
     return tix + food;
   }
 
   int get pendingGroups =>
-      bookings.where((b) => b.kind == BookingKind.group && b.status == BookingStatus.pending).length;
+      adminBookings.where((b) => b.kind == BookingKind.group && b.status == BookingStatus.pending).length;
 
   int get openOrders =>
-      orders.where((o) => o.status != OrderStatus.completed && o.status != OrderStatus.cancelled).length;
+      adminOrders.where((o) => o.status != OrderStatus.completed && o.status != OrderStatus.cancelled).length;
 }

@@ -124,6 +124,14 @@ class ProfileScreen extends StatelessWidget {
 
   Future<void> _openAdmin(BuildContext context) async {
     final store = context.read<AppStore>();
+    if (store.isCloud) {
+      if (!store.isStaff) {
+        final ok = await showDialog<bool>(context: context, builder: (_) => const _StaffLoginDialog());
+        if (ok != true || !context.mounted) return;
+      }
+      await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AdminScreen()));
+      return;
+    }
     final pin = await showDialog<String>(context: context, builder: (_) => const _PinDialog());
     if (pin == null || !context.mounted) return;
     if (!store.checkPin(pin)) return showSnack(context, 'PIN salah');
@@ -378,6 +386,86 @@ class _RewardTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Cloud mode: staff sign in with their Firebase email & password.
+class _StaffLoginDialog extends StatefulWidget {
+  const _StaffLoginDialog();
+
+  @override
+  State<_StaffLoginDialog> createState() => _StaffLoginDialogState();
+}
+
+class _StaffLoginDialogState extends State<_StaffLoginDialog> {
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  String? _error;
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    final err = await context.read<AppStore>().staffSignIn(_email.text, _password.text);
+    if (!mounted) return;
+    if (err == null) return Navigator.pop(context, true);
+    setState(() {
+      _busy = false;
+      _error = err;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Log masuk staf'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: _email,
+            autofocus: true,
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+            decoration: const InputDecoration(labelText: 'Emel'),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _password,
+            obscureText: true,
+            autofillHints: const [AutofillHints.password],
+            decoration: const InputDecoration(labelText: 'Kata laluan'),
+            onSubmitted: (_) => _submit(),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 10),
+            Text(
+              _error!,
+              style: const TextStyle(color: StegoColors.rocket, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: _busy ? null : () => Navigator.pop(context, false), child: const Text('Batal')),
+        FilledButton(
+          style: FilledButton.styleFrom(minimumSize: const Size(64, 44)),
+          onPressed: _busy ? null : _submit,
+          child: _busy
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Text('Masuk'),
+        ),
+      ],
     );
   }
 }

@@ -41,8 +41,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (!mounted) return;
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (_) => OrderScreen(orderId: o.id, justPlaced: true)));
-    } on StateError catch (e) {
-      if (mounted) showSnack(context, e.message);
+    } catch (e) {
+      if (mounted) showSnack(context, errorMessage(e));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

@@ -25,6 +25,25 @@ class AdminScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Panel Staf'),
+          actions: [
+            if (store.isCloud)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child: Tooltip(
+                  message: 'Disambung ke Firebase${store.staffEmail == null ? '' : ' • ${store.staffEmail}'}',
+                  child: const Icon(Icons.cloud_done_rounded, color: StegoColors.mint),
+                ),
+              ),
+            if (store.isCloud)
+              IconButton(
+                tooltip: 'Log keluar staf',
+                onPressed: () async {
+                  await store.staffSignOut();
+                  if (context.mounted) Navigator.of(context).pop();
+                },
+                icon: const Icon(Icons.logout_rounded),
+              ),
+          ],
           bottom: TabBar(
             isScrollable: true,
             tabAlignment: TabAlignment.start,
@@ -72,7 +91,7 @@ class _DashboardState extends State<_Dashboard> {
     final bookings = store.bookingsOn(_date);
     final kids = bookings.fold<int>(0, (a, b) => a + b.children);
     final adults = bookings.fold<int>(0, (a, b) => a + b.guardians);
-    final ordersToday = store.orders.where((o) => dateKey(o.createdAt) == dateKey(_date)).length;
+    final ordersToday = store.adminOrders.where((o) => dateKey(o.createdAt) == dateKey(_date)).length;
 
     Widget kpi(String label, String value, IconData icon, Color color) => Expanded(
       child: StegoCard(
@@ -130,7 +149,7 @@ class _DashboardState extends State<_Dashboard> {
           if (store.pendingGroups > 0) ...[
             const SizedBox(height: 18),
             const SectionHeader('Permohonan kumpulan menunggu'),
-            for (final b in store.bookings.where(
+            for (final b in store.adminBookings.where(
               (b) => b.kind == BookingKind.group && b.status == BookingStatus.pending,
             ))
               Padding(
@@ -215,7 +234,11 @@ Future<void> _showBookingActions(BuildContext context, Booking b) async {
         child: FilledButton.icon(
           style: FilledButton.styleFrom(backgroundColor: color, minimumSize: const Size.fromHeight(50)),
           onPressed: () async {
-            await run();
+            try {
+              await run();
+            } catch (e) {
+              if (context.mounted) showSnack(context, errorMessage(e));
+            }
             if (c.mounted) Navigator.pop(c);
           },
           icon: Icon(icon),
@@ -315,7 +338,7 @@ class _BookingsState extends State<_Bookings> {
     final store = context.watch<AppStore>();
     final q = _search.text.trim().toUpperCase().replaceFirst('STEGOLAND:', '');
     final list = q.isNotEmpty
-        ? store.bookings
+        ? store.adminBookings
               .where(
                 (b) =>
                     b.id.contains(q) ||
@@ -324,7 +347,7 @@ class _BookingsState extends State<_Bookings> {
                     (b.group?.institution.toUpperCase().contains(q) ?? false),
               )
               .toList()
-        : (store.bookings.where((b) => b.date == dateKey(_date)).toList()
+        : (store.adminBookings.where((b) => b.date == dateKey(_date)).toList()
             ..sort((a, b) => a.slotId.compareTo(b.slotId)));
 
     return ContentWidth(
@@ -378,12 +401,12 @@ class _Orders extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final store = context.watch<AppStore>();
-    final open = store.orders
+    final open = store.adminOrders
         .where((o) => o.status != OrderStatus.completed && o.status != OrderStatus.cancelled)
         .toList()
         .reversed // oldest first, like a kitchen queue
         .toList();
-    final done = store.orders.where((o) => !open.contains(o)).take(20).toList();
+    final done = store.adminOrders.where((o) => !open.contains(o)).take(20).toList();
 
     Widget card(CafeOrder o) {
       final next = o.status.next;
@@ -663,35 +686,40 @@ class _SettingsAdminState extends State<_SettingsAdmin> {
   Future<void> _save() async {
     final store = context.read<AppStore>();
     final pin = _c['pin']!.text.trim();
-    if (pin.length < 4) return showSnack(context, 'PIN mesti sekurang-kurangnya 4 digit');
+    if (!store.isCloud && pin.length < 4) return showSnack(context, 'PIN mesti sekurang-kurangnya 4 digit');
     if (_s.lastCallEnd <= _s.lastCallStart) {
       return showSnack(context, 'Masa tamat Last Call mesti selepas masa mula');
     }
-    await store.updateSettings(
-      _s.copyWith(
-        weekdayPrice: _d('weekday', _s.weekdayPrice),
-        weekendPrice: _d('weekend', _s.weekendPrice),
-        holidayPrice: _d('holiday', _s.holidayPrice),
-        guardianPrice: _d('guardian', _s.guardianPrice),
-        groupChildPrice: _d('groupChild', _s.groupChildPrice),
-        freeTeachers: _i('freeTeachers', _s.freeTeachers),
-        extraTeacherPrice: _d('extraTeacher', _s.extraTeacherPrice),
-        kidsMealPrice: _d('meal', _s.kidsMealPrice),
-        drinkPrice: _d('drink', _s.drinkPrice),
-        privateSessionPrice: _d('private', _s.privateSessionPrice),
-        groupMinimum: _i('groupMin', _s.groupMinimum),
-        slotCapacity: _i('capacity', _s.slotCapacity),
-        adminPin: pin,
-      ),
-    );
-    await store.updateBusiness(
-      _b.copyWith(
-        phone: _c['phone']!.text.trim(),
-        whatsapp: _c['whatsapp']!.text.replaceAll(RegExp(r'\D'), ''),
-        openingHours: _c['hours']!.text.trim(),
-        address: _c['address']!.text.trim(),
-      ),
-    );
+    try {
+      await store.updateSettings(
+        _s.copyWith(
+          weekdayPrice: _d('weekday', _s.weekdayPrice),
+          weekendPrice: _d('weekend', _s.weekendPrice),
+          holidayPrice: _d('holiday', _s.holidayPrice),
+          guardianPrice: _d('guardian', _s.guardianPrice),
+          groupChildPrice: _d('groupChild', _s.groupChildPrice),
+          freeTeachers: _i('freeTeachers', _s.freeTeachers),
+          extraTeacherPrice: _d('extraTeacher', _s.extraTeacherPrice),
+          kidsMealPrice: _d('meal', _s.kidsMealPrice),
+          drinkPrice: _d('drink', _s.drinkPrice),
+          privateSessionPrice: _d('private', _s.privateSessionPrice),
+          groupMinimum: _i('groupMin', _s.groupMinimum),
+          slotCapacity: _i('capacity', _s.slotCapacity),
+          adminPin: pin,
+        ),
+      );
+      await store.updateBusiness(
+        _b.copyWith(
+          phone: _c['phone']!.text.trim(),
+          whatsapp: _c['whatsapp']!.text.replaceAll(RegExp(r'\D'), ''),
+          openingHours: _c['hours']!.text.trim(),
+          address: _c['address']!.text.trim(),
+        ),
+      );
+    } catch (e) {
+      if (mounted) showSnack(context, 'Gagal simpan: $e');
+      return;
+    }
     if (mounted) showSnack(context, 'Tetapan disimpan');
   }
 
@@ -819,8 +847,7 @@ class _SettingsAdminState extends State<_SettingsAdmin> {
           _field('whatsapp', 'No. WhatsApp (cth: 60182351000)', money: false, number: false),
           _field('hours', 'Waktu operasi', money: false, number: false),
           _field('address', 'Alamat', money: false, number: false),
-          const SectionHeader('Keselamatan'),
-          _field('pin', 'PIN staf', money: false),
+          if (!store.isCloud) ...[const SectionHeader('Keselamatan'), _field('pin', 'PIN staf', money: false)],
           const SizedBox(height: 10),
           FilledButton.icon(
             onPressed: _save,
@@ -828,35 +855,36 @@ class _SettingsAdminState extends State<_SettingsAdmin> {
             label: const Text('Simpan Tetapan'),
           ),
           const SizedBox(height: 24),
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(foregroundColor: StegoColors.rocket),
-            onPressed: () async {
-              final ok = await showDialog<bool>(
-                context: context,
-                builder: (c) => AlertDialog(
-                  title: const Text('Set semula semua data?'),
-                  content: const Text('Semua tempahan, pesanan, menu dan tetapan pada peranti ini akan dipadam.'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Batal')),
-                    FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: StegoColors.rocket,
-                        minimumSize: const Size(64, 44),
+          if (!store.isCloud)
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(foregroundColor: StegoColors.rocket),
+              onPressed: () async {
+                final ok = await showDialog<bool>(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                    title: const Text('Set semula semua data?'),
+                    content: const Text('Semua tempahan, pesanan, menu dan tetapan pada peranti ini akan dipadam.'),
+                    actions: [
+                      TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Batal')),
+                      FilledButton(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: StegoColors.rocket,
+                          minimumSize: const Size(64, 44),
+                        ),
+                        onPressed: () => Navigator.pop(c, true),
+                        child: const Text('Set semula'),
                       ),
-                      onPressed: () => Navigator.pop(c, true),
-                      child: const Text('Set semula'),
-                    ),
-                  ],
-                ),
-              );
-              if (ok == true) {
-                await store.resetAll();
-                if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
-              }
-            },
-            icon: const Icon(Icons.restart_alt_rounded),
-            label: const Text('Set semula data peranti'),
-          ),
+                    ],
+                  ),
+                );
+                if (ok == true) {
+                  await store.resetAll();
+                  if (context.mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+                }
+              },
+              icon: const Icon(Icons.restart_alt_rounded),
+              label: const Text('Set semula data peranti'),
+            ),
         ],
       ),
     );

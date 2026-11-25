@@ -1,0 +1,126 @@
+rules_version = '2';
+
+// Stegoland — Firestore security rules.
+// Customers: anonymous Firebase Auth. Staff: email/password users that have a
+// document at /staff/{uid} (create it manually in the Firebase console).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isStaff() {
+      return signedIn() && exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+    function changed() { return request.resource.data.diff(resource.data).affectedKeys(); }
+
+    // ---------------------------------------------------------------- staff
+    match /staff/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false; // console only
+    }
+
+    // ---------------------------------------------------------------- public catalogue
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+    match /menu/{id} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+    match /deals/{id} {
+      allow read: if true;
+      allow create, delete: if isStaff();
+      // Customers placing an order may only take stock (qtyLeft goes down).
+      allow update: if isStaff()
+        || (signedIn()
+            && changed().hasOnly(['qtyLeft'])
+            && request.resource.data.qtyLeft is int
+            && request.resource.data.qtyLeft >= 0
+            && request.resource.data.qtyLeft < resource.data.qtyLeft);
+    }
+
+    // ---------------------------------------------------------------- bookings
+    function validNewBooking(id) {
+      let b = request.resource.data;
+      return b.id == id
+        && b.ownerUid == request.auth.uid
+        && b.paid == false
+        && b.children is int && b.children > 0 && b.children <= 500
+        && b.guardians is int && b.guardians >= 0
+        && b.total is number && b.total >= 0
+        && b.date is string && b.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$')
+        && ((b.kind == 'family' && b.status == 'confirmed') || (b.kind == 'group' && b.status == 'pending'))
+        // The public capacity entry must be written in the same batch.
+        && existsAfter(/databases/$(database)/documents/slotEntries/$(id));
+    }
+
+    match /bookings/{id} {
+      allow read: if isStaff() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow create: if signedIn() && validNewBooking(id);
+      allow update: if isStaff()
+        || (signedIn()
+            && resource.data.ownerUid == request.auth.uid
+            && changed().hasOnly(['status'])
+            && request.resource.data.status == 'cancelled'
+            && resource.data.status in ['pending', 'confirmed']);
+      allow delete: if isStaff();
+    }
+
+    // Public, PII-free seat counts so every customer can see live capacity.
+    match /slotEntries/{id} {
+      function booking() { return getAfter(/databases/$(database)/documents/bookings/$(id)).data; }
+      allow read: if true;
+      allow create: if signedIn()
+        && booking().ownerUid == request.auth.uid
+        && request.resource.data.keys().hasOnly(['date', 'slotId', 'children', 'private', 'active'])
+        && request.resource.data.date == booking().date
+        && request.resource.data.slotId == booking().slotId
+        && request.resource.data.children == booking().children
+        && request.resource.data.active == true
+        && request.resource.data.private == (booking().kind == 'group' && booking().get('group', {}).get('privateSession', false) == true);
+      // Owner may only release seats when cancelling; staff may toggle.
+      allow update: if changed().hasOnly(['active'])
+        && (isStaff()
+            || (signedIn()
+                && booking().ownerUid == request.auth.uid
+                && booking().status == 'cancelled'
+                && request.resource.data.active == false));
+      allow delete: if isStaff();
+    }
+
+    // ---------------------------------------------------------------- cafe orders
+    match /orders/{id} {
+      allow read: if isStaff() || (signedIn() && resource.data.ownerUid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.id == id
+        && request.resource.data.ownerUid == request.auth.uid
+        && request.resource.data.status == 'received'
+        && request.resource.data.lines is list
+        && request.resource.data.lines.size() > 0;
+      allow update: if isStaff() && changed().hasOnly(['status']);
+      allow delete: if isStaff();
+    }
+
+    // ---------------------------------------------------------------- members
+    match /members/{uid} {
+      allow read: if isStaff() || (signedIn() && request.auth.uid == uid);
+      allow create: if signedIn() && request.auth.uid == uid && request.resource.data.points == 0;
+      // Owners can edit their profile and spend points, never add points.
+      allow update: if isStaff()
+        || (signedIn() && request.auth.uid == uid
+            && changed().hasOnly(['name', 'phone', 'points'])
+            && request.resource.data.points <= resource.data.points
+            && request.resource.data.points >= 0);
+
+      match /vouchers/{code} {
+        allow read: if isStaff() || (signedIn() && request.auth.uid == uid);
+        // A voucher must be paid for with points in the same transaction.
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.cost is int && request.resource.data.cost >= 50
+          && getAfter(/databases/$(database)/documents/members/$(uid)).data.points
+             == get(/databases/$(database)/documents/members/$(uid)).data.points - request.resource.data.cost;
+        allow update: if isStaff() && changed().hasOnly(['used']);
+      }
+    }
+  }
+}

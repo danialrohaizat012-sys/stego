@@ -99,5 +99,11 @@ flutter run -d chrome --dart-define=FIREBASE_EMULATOR=localhost
 
 ## Deploy web
 
+**Vercel** (projek `bina-lab/stego`): `vercel.json` memasang Flutter 3.50.1 (`scripts/vercel-install.sh`),
+menjalankan `flutter build web` dan menyajikan `build/web`. Setiap push ke `main` deploy automatik.
+`web/sw.js` ialah *kill-switch* untuk service worker PWA lama — pelawat lama akan dimuat semula ke app baharu secara automatik.
+
+**GitHub Pages**:
+
 Workflow `.github/workflows/deploy-web.yml` membina dan menerbitkan versi web ke GitHub Pages setiap kali
 `main` dikemas kini (Settings → Pages → Source: **GitHub Actions**).

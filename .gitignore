@@ -53,3 +53,7 @@ firebase_tests/node_modules/
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+
+# Flutter SDK downloaded by scripts/vercel-install.sh
+/flutter/
+.vercel
